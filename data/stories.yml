@@ -13,6 +13,7 @@ stories:
     - intent: affirm
     - action: action_submit_booking
 
+#Story for cancelling booking
 - story: Cancel booking
   steps:
     - intent: book_hotel

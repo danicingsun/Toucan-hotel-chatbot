@@ -157,7 +157,7 @@ responses:
         • Payment: {payment}
         • Refund policy: {refund}
 
-        Shall I confirm the booking?
+        Would you like to confirm the booking? Please answer with confirm or deny.
 
   utter_goodbye:
     - text: "Okay, booking cancelled. Let me know if you need anything else."

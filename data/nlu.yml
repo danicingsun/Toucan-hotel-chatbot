@@ -20,6 +20,7 @@ nlu:
     - I need a hotel booking
     - Reserve a hotel room
     - I want to stay at your hotel
+    - can I book a room?
 
 - intent: stop
   examples: |

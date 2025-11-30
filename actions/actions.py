@@ -7,7 +7,7 @@ from rasa_sdk.forms import FormValidationAction
 import re
 from datetime import datetime
 
-
+# Class to validate all form slots in separate methods
 class ValidateBookingForm(FormValidationAction):
 
     def name(self) -> Text:
