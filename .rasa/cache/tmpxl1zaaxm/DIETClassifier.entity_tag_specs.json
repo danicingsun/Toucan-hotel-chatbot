@@ -1,0 +1,36 @@
+[
+  {
+    "tag_name": "entity",
+    "ids_to_tags": {
+      "1": "B-greet",
+      "2": "I-greet",
+      "3": "L-greet",
+      "4": "U-greet",
+      "5": "B-provide_checkin_date",
+      "6": "I-provide_checkin_date",
+      "7": "L-provide_checkin_date",
+      "8": "U-provide_checkin_date",
+      "9": "B-tell_name",
+      "10": "I-tell_name",
+      "11": "L-tell_name",
+      "12": "U-tell_name",
+      "0": "O"
+    },
+    "tags_to_ids": {
+      "B-greet": 1,
+      "I-greet": 2,
+      "L-greet": 3,
+      "U-greet": 4,
+      "B-provide_checkin_date": 5,
+      "I-provide_checkin_date": 6,
+      "L-provide_checkin_date": 7,
+      "U-provide_checkin_date": 8,
+      "B-tell_name": 9,
+      "I-tell_name": 10,
+      "L-tell_name": 11,
+      "U-tell_name": 12,
+      "O": 0
+    },
+    "num_tags": 13
+  }
+]

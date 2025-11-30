@@ -1,0 +1,36 @@
+[
+  {
+    "tag_name": "entity",
+    "ids_to_tags": {
+      "1": "B-checkin",
+      "2": "I-checkin",
+      "3": "L-checkin",
+      "4": "U-checkin",
+      "5": "B-greet",
+      "6": "I-greet",
+      "7": "L-greet",
+      "8": "U-greet",
+      "9": "B-name",
+      "10": "I-name",
+      "11": "L-name",
+      "12": "U-name",
+      "0": "O"
+    },
+    "tags_to_ids": {
+      "B-checkin": 1,
+      "I-checkin": 2,
+      "L-checkin": 3,
+      "U-checkin": 4,
+      "B-greet": 5,
+      "I-greet": 6,
+      "L-greet": 7,
+      "U-greet": 8,
+      "B-name": 9,
+      "I-name": 10,
+      "L-name": 11,
+      "U-name": 12,
+      "O": 0
+    },
+    "num_tags": 13
+  }
+]

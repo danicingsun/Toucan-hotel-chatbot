@@ -1,0 +1,10 @@
+{
+  "lookup": {
+    "eJyLrq6NBQAEOAGx": "action_listen",
+    "eJyLrq7VUaguKEoti09MLsnMz7NSqIYw4vMSc1OtFKCcnMziktQ8oNrS4tQioJrMPCC3xEohvSg1taS2NhYA6dwbhQ==": "utter_greet",
+    "eJyLrq7VUaguKEoti09MLsnMz7NSqIYw4vMSc1OtFKCcnMziktQ8oNrS4tQioJrMPCC3xEohvSg1taSWgBmlJSWpRfEQpbhMiAUAQvc0lw==": "action_listen",
+    "eJyLrq7VUaguKEoti09MLsnMz7NSqIYw4vMSc1OtFKCcnMziktQ8oNrS4tQioJrMPCC3xEohvSg1taSWgBmlJSWpRfEQpeSZQMAVSfn52fEZ+SWpObW1sQA8OVB6": "hotel_form",
+    "eJydjkEOgzAMBL+SB/QF+QqqLIq2JWqIkWO4RPwdl3DhEqTevNrRrLuyPVyZBSv1gwZO3pV6UOoneHeGGLIiGbtkiDEhWVTvPgLoduNYVCFU0f8MN1+8mL80siIeoh+9giLzbFA1HC29WSYjGksXrjHz3AFyU3d9": "utter_confirm_booking",
+    "eJy1j0EOAiEMRa/CATwBVzGmQeerRIaS0mFDuLs4uHEjiYm7/vTl/fZY28HUJCjkLuo5WlPHQNGtsOYdgs+K2NktQzrjY49qzU0AbRPHpgqhgf5mmFxxZn7QnRVhF73oAgrMqUPDsG/pyrJ24kvTB/e/mslDSbj4BbRAnQ+5tdMTYaGh1Q==": "action_listen"
+  }
+}

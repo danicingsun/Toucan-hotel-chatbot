@@ -1,0 +1,7 @@
+{
+  "rule_only_slots": [
+    "checkin_date",
+    "name"
+  ],
+  "rule_only_loops": []
+}

@@ -1,0 +1,167 @@
+version: "3.1"
+
+intents:
+  - greet
+  - book_hotel
+  - stop
+  - affirm
+  - deny
+  - provide_name
+  - provide_checkin
+  - provide_checkout
+  - provide_guests
+  - provide_room_type
+  - provide_breakfast
+  - provide_payment
+  - provide_refund
+
+entities:
+  - name
+  - checkin
+  - checkout
+  - guests
+  - room_type
+  - breakfast
+  - payment
+  - refund
+
+slots:
+  name:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: name
+        conditions:
+          - active_loop: booking_form
+            requested_slot: name
+      - type: from_text
+        conditions:
+          - active_loop: booking_form
+            requested_slot: name
+
+  checkin:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: checkin
+        conditions:
+          - active_loop: booking_form
+            requested_slot: checkin
+
+  checkout:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: checkout
+        conditions:
+          - active_loop: booking_form
+            requested_slot: checkout
+
+  guests:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: guests
+        conditions:
+          - active_loop: booking_form
+            requested_slot: guests
+
+
+  room_type:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: room_type
+        conditions:
+          - active_loop: booking_form
+            requested_slot: room_type
+
+
+  breakfast:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: breakfast
+        conditions:
+          - active_loop: booking_form
+            requested_slot: breakfast
+
+  payment:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: payment
+        conditions:
+          - active_loop: booking_form
+            requested_slot: payment
+
+
+  refund:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: refund
+        conditions:
+          - active_loop: booking_form
+            requested_slot: refund
+ 
+forms:
+  booking_form:
+    required_slots:
+      - name
+      - checkin
+      - checkout
+      - guests
+      - room_type
+      - breakfast
+      - payment
+      - refund
+
+responses:
+  utter_greet:
+    - text: "Hello! How can I help you today?"
+
+  utter_ask_name:
+    - text: "What is the guest name for the booking?"
+
+  utter_ask_checkin:
+    - text: "What is the check-in date? (YYYY-MM-DD)"
+
+  utter_ask_checkout:
+    - text: "What is the check-out date? (YYYY-MM-DD)"
+
+  utter_ask_guests:
+    - text: "How many guests will be staying?"
+
+  utter_ask_room_type:
+    - text: "What type of room would you prefer? (single, double, suite)"
+
+  utter_ask_breakfast:
+    - text: "Would you like breakfast included? (yes/no)"
+
+  utter_ask_payment:
+    - text: "What payment method do you prefer? (credit card / paypal)"
+
+  utter_ask_refund:
+    - text: "Do you prefer a refundable or non-refundable rate?"
+
+  utter_summary:
+    - text: |
+        Here is your booking summary:
+        • Name: {name}
+        • Check-in: {checkin}
+        • Check-out: {checkout}
+        • Guests: {guests}
+        • Room type: {room_type}
+        • Breakfast: {breakfast}
+        • Payment: {payment}
+        • Refund policy: {refund}
+
+        Shall I confirm the booking?
+
+  utter_goodbye:
+    - text: "Okay, booking cancelled. Let me know if you need anything else."
+
+actions:
+  - validate_booking_form
+  - action_submit_booking

@@ -1,0 +1,24 @@
+version: "3.1"
+
+stories:
+
+- story: Greet and book
+  steps:
+    - intent: greet
+    - action: utter_greet
+    - intent: book_hotel
+    - action: booking_form
+    - active_loop: booking_form
+    # Form handles slot filling automatically
+    - intent: affirm
+    - action: action_submit_booking
+
+- story: Cancel booking
+  steps:
+    - intent: book_hotel
+    - action: booking_form
+    - active_loop: booking_form
+    - intent: stop
+    - action: utter_goodbye
+    - action: action_deactivate_loop
+    - active_loop: null

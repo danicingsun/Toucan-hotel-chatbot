@@ -1,0 +1,17 @@
+{
+  "0": "affirm",
+  "1": "choose_breakfast",
+  "2": "choose_cot",
+  "3": "choose_payment",
+  "4": "choose_refund_policy",
+  "5": "choose_room_type",
+  "6": "confirm_booking",
+  "7": "deny",
+  "8": "greet",
+  "9": "inform",
+  "10": "provide_checkin",
+  "11": "provide_checkout",
+  "12": "provide_guests",
+  "13": "provide_name",
+  "14": "restart"
+}

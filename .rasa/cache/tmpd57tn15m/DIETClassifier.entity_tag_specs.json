@@ -1,0 +1,52 @@
+[
+  {
+    "tag_name": "entity",
+    "ids_to_tags": {
+      "1": "B-confirm_booking",
+      "2": "I-confirm_booking",
+      "3": "L-confirm_booking",
+      "4": "U-confirm_booking",
+      "5": "B-greet",
+      "6": "I-greet",
+      "7": "L-greet",
+      "8": "U-greet",
+      "9": "B-name",
+      "10": "I-name",
+      "11": "L-name",
+      "12": "U-name",
+      "13": "B-provide_checkin_date",
+      "14": "I-provide_checkin_date",
+      "15": "L-provide_checkin_date",
+      "16": "U-provide_checkin_date",
+      "17": "B-provide_checkout_date",
+      "18": "I-provide_checkout_date",
+      "19": "L-provide_checkout_date",
+      "20": "U-provide_checkout_date",
+      "0": "O"
+    },
+    "tags_to_ids": {
+      "B-confirm_booking": 1,
+      "I-confirm_booking": 2,
+      "L-confirm_booking": 3,
+      "U-confirm_booking": 4,
+      "B-greet": 5,
+      "I-greet": 6,
+      "L-greet": 7,
+      "U-greet": 8,
+      "B-name": 9,
+      "I-name": 10,
+      "L-name": 11,
+      "U-name": 12,
+      "B-provide_checkin_date": 13,
+      "I-provide_checkin_date": 14,
+      "L-provide_checkin_date": 15,
+      "U-provide_checkin_date": 16,
+      "B-provide_checkout_date": 17,
+      "I-provide_checkout_date": 18,
+      "L-provide_checkout_date": 19,
+      "U-provide_checkout_date": 20,
+      "O": 0
+    },
+    "num_tags": 21
+  }
+]

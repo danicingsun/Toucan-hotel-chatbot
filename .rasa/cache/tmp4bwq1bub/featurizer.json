@@ -1,0 +1,65 @@
+{
+  "type": "MaxHistoryTrackerFeaturizer",
+  "state_featurizer": {
+    "action_texts": [],
+    "entity_tag_specs": [],
+    "feature_states": {
+      "intent": {
+        "back": 0,
+        "confirm_booking": 1,
+        "greet": 2,
+        "name": 3,
+        "nlu_fallback": 4,
+        "out_of_scope": 5,
+        "provide_checkin_date": 6,
+        "provide_checkout_date": 7,
+        "restart": 8,
+        "session_start": 9
+      },
+      "action_name": {
+        "action_listen": 0,
+        "action_restart": 1,
+        "action_session_start": 2,
+        "action_default_fallback": 3,
+        "action_deactivate_loop": 4,
+        "action_revert_fallback_events": 5,
+        "action_default_ask_affirmation": 6,
+        "action_default_ask_rephrase": 7,
+        "action_two_stage_fallback": 8,
+        "action_unlikely_intent": 9,
+        "action_back": 10,
+        "...": 11,
+        "action_extract_slots": 12,
+        "action_set_name": 13,
+        "action_set_checkin": 14,
+        "action_set_checkout": 15,
+        "action_set_confirmation": 16,
+        "utter_checkin": 17,
+        "utter_checkout": 18,
+        "utter_confirm": 19,
+        "utter_greet": 20,
+        "utter_name": 21,
+        "utter_summary": 22
+      },
+      "entities": {
+        "checkin_date": 0,
+        "checkout_date": 1,
+        "confirm_booking": 2,
+        "greet": 3,
+        "name": 4
+      },
+      "slots": {
+        "name_0": 0,
+        "checkin_date_0": 1,
+        "checkout_date_0": 2,
+        "confirmation_0": 3,
+        "confirmation_1": 4,
+        "summary_ready_0": 5,
+        "summary_ready_1": 6
+      },
+      "active_loop": {}
+    }
+  },
+  "remove_duplicates": true,
+  "max_history": 5
+}

@@ -1,0 +1,108 @@
+version: "3.1"
+
+nlu:
+- intent: greet
+  examples: |
+    - hello
+    - hi
+    - hey there
+    - good morning
+    - good evening
+    - hi bot
+    - hey
+
+- intent: book_hotel
+  examples: |
+    - I want to book a hotel room
+    - Can you help me book a room?
+    - I'd like to make a reservation
+    - Book a room for me
+    - I need a hotel booking
+    - Reserve a hotel room
+    - I want to stay at your hotel
+
+- intent: stop
+  examples: |
+    - cancel
+    - stop
+    - never mind
+    - forget it
+    - I don’t want to continue
+    - quit
+    - end booking
+
+- intent: affirm
+  examples: |
+    - yes
+    - yeah
+    - correct
+    - that’s right
+    - please confirm
+    - sounds good
+    - okay
+
+- intent: deny
+  examples: |
+    - no
+    - nope
+    - not really
+    - don’t confirm
+    - wrong
+    - I don’t want that
+
+# Slot-filling intents
+- intent: provide_name
+  examples: |
+    - My name is [Tsveta](name)
+    - Book under [John Smith](name)
+    - Guest name is [Maria](name)
+    - It’s [Alex](name)
+
+- intent: provide_checkin
+  examples: |
+    - Check-in on [2025-12-10](checkin)
+    - I’ll arrive [2025-11-30](checkin)
+    - The check-in date is [2025-12-01](checkin)
+    - [2025-12-05](checkin)
+
+- intent: provide_checkout
+  examples: |
+    - Check-out on [2025-12-15](checkout)
+    - I’ll leave [2025-12-20](checkout)
+    - The check-out date is [2025-12-07](checkout)
+    - [2025-12-12](checkout)
+
+- intent: provide_guests
+  examples: |
+    - [2](guests) guests
+    - [3](guests) people
+    - Just [1](guests) person
+    - We are [4](guests)
+
+- intent: provide_room_type
+  examples: |
+    - A [double](room_type) room
+    - [single](room_type) room please
+    - [suite](room_type)
+    - I want a [double](room_type)
+
+- intent: provide_breakfast
+  examples: |
+    - [yes](breakfast), include breakfast
+    - [no](breakfast), no breakfast
+    - [yes](breakfast)
+    - [no](breakfast)
+
+- intent: provide_payment
+  examples: |
+    - Pay with [credit card](payment)
+    - Use [paypal](payment)
+    - [credit card](payment)
+    - [paypal](payment)
+
+- intent: provide_refund
+  examples: |
+    - [refundable](refund) rate
+    - [non-refundable](refund) please
+    - I want [refundable](refund)
+    - [non-refundable](refund)

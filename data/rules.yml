@@ -1,0 +1,24 @@
+version: "3.1"
+
+rules:
+
+- rule: Activate booking form
+  steps:
+    - intent: book_hotel
+    - action: booking_form
+    - active_loop: booking_form
+
+- rule: Submit booking form
+  condition:
+    - active_loop: booking_form
+  steps:
+    - action: booking_form
+    - active_loop: null
+    - action: utter_summary
+
+- rule: Stop booking form
+  steps:
+    - intent: stop
+    - action: utter_goodbye
+    - action: action_deactivate_loop
+    - active_loop: null

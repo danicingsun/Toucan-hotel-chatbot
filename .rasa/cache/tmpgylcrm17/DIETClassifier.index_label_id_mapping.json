@@ -1,0 +1,13 @@
+{
+  "0": "confirm_booking",
+  "1": "greet",
+  "2": "provide_breakfast",
+  "3": "provide_checkin",
+  "4": "provide_checkout",
+  "5": "provide_guests",
+  "6": "provide_name",
+  "7": "provide_payment",
+  "8": "provide_refund",
+  "9": "provide_room_type",
+  "10": "stop"
+}
