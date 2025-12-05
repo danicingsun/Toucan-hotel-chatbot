@@ -29,11 +29,6 @@ slots:
   name:
     type: text
     mappings:
-      - type: from_entity
-        entity: name
-        conditions:
-          - active_loop: booking_form
-            requested_slot: name
       - type: from_text
         conditions:
           - active_loop: booking_form
@@ -42,6 +37,10 @@ slots:
   checkin:
     type: text
     mappings:
+      - type: from_text
+        conditions:
+          - active_loop: booking_form
+            requested_slot: checkin
       - type: from_entity
         entity: checkin
         conditions:
@@ -51,6 +50,10 @@ slots:
   checkout:
     type: text
     mappings:
+      - type: from_text
+        conditions:
+          - active_loop: booking_form
+            requested_slot: checkout
       - type: from_entity
         entity: checkout
         conditions:
@@ -60,28 +63,28 @@ slots:
   guests:
     type: text
     mappings:
+      - type: from_text
+        conditions:
+          - active_loop: booking_form
+            requested_slot: guests
       - type: from_entity
         entity: guests
         conditions:
           - active_loop: booking_form
             requested_slot: guests
 
-
   room_type:
     type: text
     mappings:
-      - type: from_entity
-        entity: room_type
+      - type: from_text
         conditions:
           - active_loop: booking_form
             requested_slot: room_type
 
-
   breakfast:
     type: text
     mappings:
-      - type: from_entity
-        entity: breakfast
+      - type: from_text
         conditions:
           - active_loop: booking_form
             requested_slot: breakfast
@@ -89,22 +92,20 @@ slots:
   payment:
     type: text
     mappings:
-      - type: from_entity
-        entity: payment
+      - type: from_text
         conditions:
           - active_loop: booking_form
             requested_slot: payment
 
-
   refund:
     type: text
     mappings:
-      - type: from_entity
-        entity: refund
+      - type: from_text
         conditions:
           - active_loop: booking_form
             requested_slot: refund
- 
+
+
 forms:
   booking_form:
     required_slots:
@@ -138,12 +139,22 @@ responses:
 
   utter_ask_breakfast:
     - text: "Would you like breakfast included? (yes/no)"
+      buttons:
+        - title: "✅ YES"
+          payload: '/provide_breakfast{"breakfast":"yes"}'
+        - title: "❌ NO"
+          payload: '/provide_breakfast{"breakfast":"no"}'
 
   utter_ask_payment:
     - text: "What payment method do you prefer? (credit card / paypal)"
 
   utter_ask_refund:
     - text: "Do you prefer a refundable or non-refundable rate?"
+      buttons:
+        - title: "Refundable"
+          payload: '/provide_refund{"refund":"refundable"}'
+        - title: "Non-refundable"
+          payload: '/provide_refund{"refund":"non-refundable"}'
 
   utter_summary:
     - text: |
@@ -158,6 +169,11 @@ responses:
         • Refund policy: {refund}
 
         Would you like to confirm the booking? Please answer with confirm or deny.
+      buttons:
+        - title: "✅ Confirm"
+          payload: "/affirm"
+        - title: "❌ Cancel"
+          payload: "/deny"
 
   utter_goodbye:
     - text: "Okay, booking cancelled. Let me know if you need anything else."
@@ -165,3 +181,4 @@ responses:
 actions:
   - validate_booking_form
   - action_submit_booking
+  - action_cancel_booking

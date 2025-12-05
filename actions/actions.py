@@ -43,6 +43,7 @@ class ValidateBookingForm(FormValidationAction):
             if checkout_date <= checkin_date:
                 dispatcher.utter_message(text="Checkout must be after check-in.")
                 return {"checkout": None}
+            return {"checkout": slot_value}
         return {"checkout": slot_value}
       dispatcher.utter_message(text="Please enter checkout in YYYY-MM-DD format.")
       return {"checkout": None}
@@ -93,6 +94,60 @@ class ActionSubmitBooking(Action):
     def name(self) -> Text:
         return "action_submit_booking"
 
-    def run(self, dispatcher, tracker, domain):
-        dispatcher.utter_message(text="Your booking has been confirmed! 🎉")
-        return []
+    def run(
+        self,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: Dict[Text, Any],
+    ) -> List[Dict[Text, Any]]:
+
+        # Retrieve the guest name slot
+        guest_name = tracker.get_slot("name")
+
+        # Confirmation message using the guest's name
+        if guest_name:
+            dispatcher.utter_message(
+                text=f"Thank you {guest_name}, your booking has been confirmed! 🎉"
+            )
+        else:
+            dispatcher.utter_message(
+                text="Your booking has been confirmed! 🎉"
+            )
+
+        # Reset all booking slots
+        return [
+            SlotSet("name", None),
+            SlotSet("checkin", None),
+            SlotSet("checkout", None),
+            SlotSet("guests", None),
+            SlotSet("room_type", None),
+            SlotSet("breakfast", None),
+            SlotSet("payment", None),
+            SlotSet("refund", None),
+        ]
+
+class ActionCancelBooking(Action):
+
+    def name(self) -> Text:
+        return "action_cancel_booking"
+
+    def run(
+        self,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: Dict[Text, Any],
+    ) -> List[Dict[Text, Any]]:
+
+        dispatcher.utter_message(text="Your booking has been cancelled. All details have been cleared.")
+
+        # Reset all booking slots
+        return [
+            SlotSet("name", None),
+            SlotSet("checkin", None),
+            SlotSet("checkout", None),
+            SlotSet("guests", None),
+            SlotSet("room_type", None),
+            SlotSet("breakfast", None),
+            SlotSet("payment", None),
+            SlotSet("refund", None),
+        ]

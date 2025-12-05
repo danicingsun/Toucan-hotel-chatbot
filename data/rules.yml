@@ -2,13 +2,12 @@ version: "3.1"
 
 rules:
 
-#Rule about activating booking form
 - rule: Activate booking form
   steps:
     - intent: book_hotel
     - action: booking_form
     - active_loop: booking_form
- 
+
 - rule: Submit booking form
   condition:
     - active_loop: booking_form
@@ -17,9 +16,14 @@ rules:
     - active_loop: null
     - action: utter_summary
 
-- rule: Stop booking form
+- rule: Confirm booking
   steps:
-    - intent: stop
-    - action: utter_goodbye
+    - intent: affirm
+    - action: action_submit_booking   # confirms + resets slots
+
+- rule: Deny booking
+  steps:
+    - intent: deny
+    - action: action_cancel_booking   # cancels + resets slots
     - action: action_deactivate_loop
     - active_loop: null

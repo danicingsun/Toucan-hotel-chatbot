@@ -2,24 +2,29 @@ version: "3.1"
 
 stories:
 
-- story: Greet and book
+- story: Affirm confirmation
   steps:
-    - intent: greet
-    - action: utter_greet
     - intent: book_hotel
     - action: booking_form
     - active_loop: booking_form
-    # Form handles slot filling automatically
     - intent: affirm
-    - action: action_submit_booking
+    - action: action_submit_booking   # confirms + resets slots
 
-#Story for cancelling booking
-- story: Cancel booking
+- story: Deny confirmation
+  steps:
+    - intent: book_hotel
+    - action: booking_form
+    - active_loop: booking_form
+    - intent: deny
+    - action: action_cancel_booking   # cancels + resets slots
+    - action: action_deactivate_loop
+
+- story: Cancel booking mid-form
   steps:
     - intent: book_hotel
     - action: booking_form
     - active_loop: booking_form
     - intent: stop
-    - action: utter_goodbye
+    - action: action_cancel_booking   # cancels + resets slots
     - action: action_deactivate_loop
     - active_loop: null

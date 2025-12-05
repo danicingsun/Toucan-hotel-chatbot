@@ -1,0 +1,15 @@
+{
+  "0": "affirm",
+  "1": "book_hotel",
+  "2": "deny",
+  "3": "greet",
+  "4": "provide_breakfast",
+  "5": "provide_checkin",
+  "6": "provide_checkout",
+  "7": "provide_guests",
+  "8": "provide_name",
+  "9": "provide_payment",
+  "10": "provide_refund",
+  "11": "provide_room_type",
+  "12": "stop"
+}

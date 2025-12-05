@@ -10,6 +10,17 @@ nlu:
     - good evening
     - hi bot
     - hey
+    - hey buddy
+    - hi assistant
+    - greetings
+    - howdy
+    - yo
+    - hi there
+    - hello there
+    - good afternoon
+    - what's up
+    - hey friend
+    - hiya
 
 - intent: book_hotel
   examples: |
@@ -21,6 +32,16 @@ nlu:
     - Reserve a hotel room
     - I want to stay at your hotel
     - can I book a room?
+    - I’d like to book accommodation
+    - Help me reserve a hotel
+    - Can you arrange a room?
+    - I want to make a hotel reservation
+    - Book accommodation for me
+    - I’d like to stay overnight
+    - Can you book me a hotel?
+    - I need to reserve a place to stay
+    - Please book a hotel for me
+    - I want to book lodging
 
 - intent: stop
   examples: |
@@ -31,6 +52,16 @@ nlu:
     - I don’t want to continue
     - quit
     - end booking
+    - abort
+    - drop it
+    - cancel the reservation
+    - stop the process
+    - forget this booking
+    - I changed my mind
+    - no need to continue
+    - terminate
+    - halt
+    - discontinue
 
 - intent: affirm
   examples: |
@@ -41,6 +72,18 @@ nlu:
     - please confirm
     - sounds good
     - okay
+    - confirm
+    - I confirm
+    - absolutely
+    - sure
+    - indeed
+    - of course
+    - definitely
+    - that works
+    - alright
+    - perfect
+    - agreed
+    - I agree
 
 - intent: deny
   examples: |
@@ -50,6 +93,18 @@ nlu:
     - don’t confirm
     - wrong
     - I don’t want that
+    - I don't confirm
+    - absolutely not
+    - no way
+    - negative
+    - not at all
+    - I disagree
+    - that’s incorrect
+    - I don’t approve
+    - I refuse
+    - nah
+    - not okay
+    - I don’t agree
 
 # Slot-filling intents
 - intent: provide_name
@@ -58,6 +113,16 @@ nlu:
     - Book under [John Smith](name)
     - Guest name is [Maria](name)
     - It’s [Alex](name)
+    - The reservation is for [Michael Brown](name)
+    - Put it under [Sarah Johnson](name)
+    - [David](name) will be staying
+    - Register me as [Emily](name)
+    - The guest is [Robert](name)
+    - [Anna](name) is the name
+    - Please book for [Chris](name)
+    - [Jessica](name) is my name
+    - [Daniel](name) is the guest
+    - [Sophia](name) will check in
 
 - intent: provide_checkin
   examples: |
@@ -65,6 +130,12 @@ nlu:
     - I’ll arrive [2025-11-30](checkin)
     - The check-in date is [2025-12-01](checkin)
     - [2025-12-05](checkin)
+    - I want to check in on [2025-12-08](checkin)
+    - Arrival date is [2025-12-09](checkin)
+    - I’ll be there [2025-12-11](checkin)
+    - My check-in is [2025-12-02](checkin)
+    - I plan to arrive [2025-12-03](checkin)
+    - [2025-12-04](checkin) is my check-in date
 
 - intent: provide_checkout
   examples: |
@@ -72,6 +143,14 @@ nlu:
     - I’ll leave [2025-12-20](checkout)
     - The check-out date is [2025-12-07](checkout)
     - [2025-12-12](checkout)
+    - Departure date is [2025-12-14](checkout)
+    - I’ll check out [2025-12-16](checkout)
+    - Leaving on [2025-12-18](checkout)
+    - My checkout is [2025-12-19](checkout)
+    - [2025-12-21](checkout) is the checkout date
+    - I’ll depart [2025-12-22](checkout)
+    - checkout on [2025-12-26](checkout)
+    - Chec out [2025-12-22](checkout)
 
 - intent: provide_guests
   examples: |
@@ -79,6 +158,12 @@ nlu:
     - [3](guests) people
     - Just [1](guests) person
     - We are [4](guests)
+    - Booking for [5](guests)
+    - There will be [6](guests) of us
+    - [7](guests) travelers
+    - [8](guests) people staying
+    - Only [2](guests) persons
+    - [10](guests) guests in total
 
 - intent: provide_room_type
   examples: |
@@ -86,6 +171,12 @@ nlu:
     - [single](room_type) room please
     - [suite](room_type)
     - I want a [double](room_type)
+    - Book a [single](room_type)
+    - Reserve a [suite](room_type)
+    - [double](room_type) bed
+    - [single](room_type) accommodation
+    - [suite](room_type) option
+    - I prefer a [double](room_type)
 
 - intent: provide_breakfast
   examples: |
@@ -93,6 +184,12 @@ nlu:
     - [no](breakfast), no breakfast
     - [yes](breakfast)
     - [no](breakfast)
+    - [yes](breakfast) please
+    - [no](breakfast), skip breakfast
+    - Breakfast [yes](breakfast)
+    - Breakfast [no](breakfast)
+    - [yes](breakfast) with breakfast
+    - [no](breakfast) without breakfast
 
 - intent: provide_payment
   examples: |
@@ -100,6 +197,12 @@ nlu:
     - Use [paypal](payment)
     - [credit card](payment)
     - [paypal](payment)
+    - Payment by [credit card](payment)
+    - I’ll pay with [paypal](payment)
+    - Charge my [credit card](payment)
+    - Use [paypal](payment) for payment
+    - [credit card](payment) option
+    - [paypal](payment) method
 
 - intent: provide_refund
   examples: |
@@ -107,3 +210,9 @@ nlu:
     - [non-refundable](refund) please
     - I want [refundable](refund)
     - [non-refundable](refund)
+    - Book a [refundable](refund) option
+    - Choose [non-refundable](refund)
+    - [refundable](refund) booking
+    - [non-refundable](refund) reservation
+    - Prefer [refundable](refund)
+    - Go with [non-refundable](refund)
