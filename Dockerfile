@@ -1,11 +1,11 @@
 # Dockerfile (Rasa server)
 FROM rasa/rasa:3.6.20-full
 
+# Override Rasa entrypoint so we can run bash or python normally
+ENTRYPOINT []
+
 WORKDIR /app
 COPY . .
-
-# Install extra python deps (for custom components)
-RUN pip install --no-cache-dir -r requirements.txt || true
 
 # If you store model in remote storage, include a start script that downloads it
 # and extracts into /app/models. Otherwise copy models into the image at build.
