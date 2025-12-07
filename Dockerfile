@@ -16,6 +16,11 @@ USER root
 RUN if [ -f /app/requirements.txt ]; then pip install --no-cache-dir -r /app/requirements.txt; fi
 USER 1001
 
+# -----------------------------
+# FIX: point Rasa cache to a writable location
+# -----------------------------
+ENV RASA_CACHE_DB="sqlite:////tmp/rasa_cache.db"
+
 # Expose recommended port. Render will give an env $PORT which we set in render.yaml or env vars.
 EXPOSE 10000
 
