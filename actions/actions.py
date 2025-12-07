@@ -21,19 +21,28 @@ class ValidateBookingForm(FormValidationAction):
         return {"name": None}
 
     # --- DATE FORMAT ---
-    def valid_date(self, date_str):
-        try:
-            datetime.strptime(date_str, "%Y-%m-%d")
-            return True
-        except:
-            return False
+def validate_checkin(self, slot_value, dispatcher, tracker, domain):
+    try:
+        # Parse the string into a date object
+        checkin_date = datetime.datetime.strptime(slot_value, "%Y-%m-%d").date()
+        today = datetime.date.today()
 
-    def validate_checkin(self, slot_value, dispatcher, tracker, domain):
-        if self.valid_date(slot_value):
-            return {"checkin": slot_value}
-        dispatcher.utter_message(text="Please enter a valid check-in date in format YYYY-MM-DD.")
+        # Ensure the date is after today
+        if checkin_date <= today:
+            dispatcher.utter_message(
+                text="Check-in must be a future date after today. Please provide a valid date."
+            )
+            return {"checkin": None}
+
+        # If format is valid and date is in the future
+        return {"checkin": slot_value}
+
+    except ValueError:
+        # If parsing fails, the format is wrong
+        dispatcher.utter_message(
+            text="Please enter a valid check-in date in format YYYY-MM-DD."
+        )
         return {"checkin": None}
-
     def validate_checkout(self, slot_value, dispatcher, tracker, domain):
       if self.valid_date(slot_value):
         checkin = tracker.get_slot("checkin")
@@ -64,11 +73,31 @@ class ValidateBookingForm(FormValidationAction):
         return {"room_type": None}
 
     # --- BREAKFAST ---
-    def validate_breakfast(self, slot_value, dispatcher, tracker, domain):
-        if slot_value.lower() in ["yes", "no"]:
-            return {"breakfast": slot_value}
-        dispatcher.utter_message(text="Please answer yes or no.")
+    def validate_breakfast(
+        self,
+        value: str,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: DomainDict,
+    ) -> dict:
+        if not value:
+            return {"breakfast": None}
+
+        norm = str(value).strip().lower()
+        if norm in ["yes", "y", "true", "✅ yes"]:
+            return {"breakfast": "yes"}
+        if norm in ["no", "n", "false", "❌ no"]:
+            return {"breakfast": "no"}
+
+        # If the NLU passed the entity value already
+        ent = next((e for e in tracker.latest_message.get("entities", []) if e.get("entity") == "breakfast"), None)
+        if ent and ent.get("value") in ["yes", "no"]:
+            return {"breakfast": ent.get("value")}
+
+        # Ask again if it's something else
+        dispatcher.utter_message(text="Please choose yes or no.")
         return {"breakfast": None}
+
 
     # --- PAYMENT ---
     def validate_payment(self, slot_value, dispatcher, tracker, domain):
@@ -107,7 +136,7 @@ class ActionSubmitBooking(Action):
         # Confirmation message using the guest's name
         if guest_name:
             dispatcher.utter_message(
-                text=f"Thank you {guest_name}, your booking has been confirmed! 🎉"
+                text=f"Thank you {guest_name}, your booking has been confirmed! 🎉 May I assisst you with you with anything else?"
             )
         else:
             dispatcher.utter_message(

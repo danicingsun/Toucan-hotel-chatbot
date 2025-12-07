@@ -106,6 +106,7 @@ nlu:
     - not okay
     - I don’t agree
 
+
 # Slot-filling intents
 - intent: provide_name
   examples: |

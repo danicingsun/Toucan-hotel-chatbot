@@ -80,6 +80,11 @@ slots:
         conditions:
           - active_loop: booking_form
             requested_slot: room_type
+      - type: from_entity
+        entity: room_type
+        conditions:
+          - active_loop: booking_form
+            requested_slot: room_type
 
   breakfast:
     type: text
@@ -88,11 +93,21 @@ slots:
         conditions:
           - active_loop: booking_form
             requested_slot: breakfast
-
+      - type: from_entity
+        entity: breakfast
+        conditions:
+          - active_loop: booking_form
+            requested_slot: breakfast
+  
   payment:
     type: text
     mappings:
       - type: from_text
+        conditions:
+          - active_loop: booking_form
+            requested_slot: payment
+      - type: from_entity
+        entity: payment
         conditions:
           - active_loop: booking_form
             requested_slot: payment
@@ -101,6 +116,11 @@ slots:
     type: text
     mappings:
       - type: from_text
+        conditions:
+          - active_loop: booking_form
+            requested_slot: refund
+      - type: from_entity
+        entity: refund
         conditions:
           - active_loop: booking_form
             requested_slot: refund
@@ -126,19 +146,19 @@ responses:
     - text: "What is the guest name for the booking?"
 
   utter_ask_checkin:
-    - text: "What is the check-in date? (YYYY-MM-DD)"
+    - text: "It's nice to chat with you {name}. What is your check-in date? (YYYY-MM-DD)"
 
   utter_ask_checkout:
-    - text: "What is the check-out date? (YYYY-MM-DD)"
+    - text: "What is your check-out date? (YYYY-MM-DD)"
 
   utter_ask_guests:
     - text: "How many guests will be staying?"
 
   utter_ask_room_type:
-    - text: "What type of room would you prefer? (single, double, suite)"
+    - text: "What type of room would you prefer {name}? (single, double, suite)"
 
   utter_ask_breakfast:
-    - text: "Would you like breakfast included? (yes/no)"
+    - text: "Would you like breakfast included {name}? (yes/no)"
       buttons:
         - title: "✅ YES"
           payload: '/provide_breakfast{"breakfast":"yes"}'
@@ -146,8 +166,13 @@ responses:
           payload: '/provide_breakfast{"breakfast":"no"}'
 
   utter_ask_payment:
-    - text: "What payment method do you prefer? (credit card / paypal)"
-
+    - text: "What payment method do you prefer {name}? (credit card / paypal)"
+      buttons:
+        - title: "Credit card"
+          payload: '/provide_payment{"payment":"credit card"}'
+        - title: "Paypal"
+          payload: '/provide_payment{"payment":"paypal"}'
+  
   utter_ask_refund:
     - text: "Do you prefer a refundable or non-refundable rate?"
       buttons:
