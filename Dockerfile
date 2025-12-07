@@ -11,6 +11,11 @@ RUN pip install --no-cache-dir -r requirements.txt || true
 # and extracts into /app/models. Otherwise copy models into the image at build.
 COPY models /app/models
 
+# Install extra dependencies as root to avoid permission errors
+USER root
+RUN if [ -f /app/requirements.txt ]; then pip install --no-cache-dir -r /app/requirements.txt; fi
+USER 1001
+
 # Expose recommended port. Render will give an env $PORT which we set in render.yaml or env vars.
 EXPOSE 10000
 

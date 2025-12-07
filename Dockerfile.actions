@@ -3,7 +3,10 @@ FROM rasa/rasa-sdk:3.6.2
 WORKDIR /app
 COPY . .
 
-RUN pip install --no-cache-dir -r /app/requirements.txt || true
+# Install extra dependencies as root to avoid permission errors
+USER root
+RUN if [ -f /app/requirements.txt ]; then pip install --no-cache-dir -r /app/requirements.txt; fi
+USER 1001
 
 EXPOSE 5055
 
