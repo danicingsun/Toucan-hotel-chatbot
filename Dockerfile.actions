@@ -6,4 +6,6 @@ COPY . .
 RUN pip install --no-cache-dir -r /app/requirements.txt || true
 
 EXPOSE 5055
-CMD ["bash", "-lc", "python -m rasa_sdk --actions actions -p ${PORT:-5055}"]
+
+# Start the Rasa Action Server
+CMD ["python", "-m", "rasa_sdk", "--actions", "actions", "--port", "5055"]
