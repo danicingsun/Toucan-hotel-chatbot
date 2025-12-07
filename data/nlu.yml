@@ -65,6 +65,7 @@ nlu:
 
 - intent: affirm
   examples: |
+    - aye
     - yes
     - yeah
     - correct
