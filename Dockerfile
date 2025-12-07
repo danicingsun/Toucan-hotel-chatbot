@@ -16,16 +16,22 @@ USER root
 RUN if [ -f /app/requirements.txt ]; then pip install --no-cache-dir -r /app/requirements.txt; fi
 USER 1001
 
-# -----------------------------
-# FIX: point Rasa cache to a writable location
-# -----------------------------
-ENV RASA_CACHE_DB="sqlite:////tmp/rasa_cache.db"
+# ----------------------------------------
+# TRAIN MODEL IN /tmp (Writable on Render)
+# ----------------------------------------
+RUN mkdir -p /tmp/rasa
+RUN rasa train \
+    --domain /app/domain.yml \
+    --data /app/data \
+    --config /app/config.yml \
+    --out /tmp/rasa
+
+# Copy model back into the app folder
+RUN mkdir -p /app/models && cp /tmp/rasa/*.tar.gz /app/models/
 
 # Expose recommended port. Render will give an env $PORT which we set in render.yaml or env vars.
 EXPOSE 10000
 
-# ---- TRAIN MODEL DURING DOCKER BUILD ----
-RUN rasa train --domain domain.yml --data data --config config.yml --out models
 
 # Use a small wrapper to honor PORT env var or fallback to 10000
 CMD ["bash", "-lc", "rasa run --enable-api --cors \"*\" --port ${PORT:-10000} --model models"]
