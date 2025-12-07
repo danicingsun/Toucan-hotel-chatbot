@@ -2,7 +2,7 @@
 FROM rasa/rasa:3.6.20-full
 
 WORKDIR /app
-COPY . /app
+COPY . .
 
 # Install extra python deps (for custom components)
 RUN pip install --no-cache-dir -r requirements.txt || true
