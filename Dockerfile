@@ -19,5 +19,8 @@ USER 1001
 # Expose recommended port. Render will give an env $PORT which we set in render.yaml or env vars.
 EXPOSE 10000
 
+# ---- TRAIN MODEL DURING DOCKER BUILD ----
+RUN rasa train --domain domain.yml --data data --config config.yml --out models
+
 # Use a small wrapper to honor PORT env var or fallback to 10000
 CMD ["bash", "-lc", "rasa run --enable-api --cors \"*\" --port ${PORT:-10000} --model models"]
