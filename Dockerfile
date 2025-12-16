@@ -16,19 +16,6 @@ USER root
 RUN if [ -f /app/requirements.txt ]; then pip install --no-cache-dir -r /app/requirements.txt; fi
 USER 1001
 
-# ----------------------------------------
-# TRAIN MODEL IN /tmp (Writable on Render)
-# ----------------------------------------
-RUN mkdir -p /tmp/rasa
-RUN rasa train \
-    --domain /app/domain.yml \
-    --data /app/data \
-    --config /app/config.yml \
-    --out /tmp/rasa
-
-# Copy model back into the app folder
-RUN mkdir -p /app/models && cp /tmp/rasa/*.tar.gz /app/models/
-
 # Expose recommended port. Render will give an env $PORT which we set in render.yaml or env vars.
 EXPOSE 10000
 
