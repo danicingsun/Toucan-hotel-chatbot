@@ -22,4 +22,4 @@ EXPOSE 10000
 
 
 # Use a small wrapper to honor PORT env var or fallback to 10000
-CMD ["bash", "-lc", "rasa run --enable-api --cors \"*\" --host 0.0.0.0 --port ${PORT:-10000} --model models"]
+CMD ["bash", "-lc", "rasa run --enable-api --cors \"*\" --port ${PORT:-10000} --model models"]
