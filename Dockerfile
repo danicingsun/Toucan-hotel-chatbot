@@ -1,25 +1,24 @@
-# Dockerfile (Rasa server)
 FROM rasa/rasa:3.6.20-full
 
-# Override Rasa entrypoint so we can run bash or python normally
+# Override Rasa entrypoint
 ENTRYPOINT []
 
 WORKDIR /app
-COPY . .
+COPY . /app
 
-# If you store model in remote storage, include a start script that downloads it
-# and extracts into /app/models. Otherwise copy models into the image at build.
+# Copy pre-trained models
 COPY models /app/models
 
-# Install extra dependencies as root to avoid permission errors
+# Install extra dependencies
 USER root
-RUN if [ -f /app/requirements.txt ]; then pip install --no-cache-dir -r /app/requirements.txt; fi
+RUN if [ -f /app/requirements.txt ]; then \
+      pip install --no-cache-dir -r /app/requirements.txt; \
+    fi
 USER 1001
 
-# Expose recommended port. Render will give an env $PORT which we set in render.yaml or env vars.
+# Render expects this
 ENV PORT=10000
 EXPOSE 10000
 
-
-# Use a small wrapper to honor PORT env var or fallback to 10000
-CMD ["bash", "-lc", "rasa run --enable-api --cors \"*\" --port ${PORT:-10000} --model models"]
+# IMPORTANT: use sh, not bash -lc
+CMD ["sh", "-c", "rasa run --enable-api --cors \"*\" --host 0.0.0.0 --port $PORT --model models"]
