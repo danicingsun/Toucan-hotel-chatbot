@@ -11,4 +11,4 @@ USER 1001
 EXPOSE 5055
 
 # Start the Rasa Action Server
-CMD ["python", "-m", "rasa_sdk", "--actions", "actions", "--port", "5055"]
+CMD ["start"]
