@@ -8,7 +8,7 @@ USER root
 RUN if [ -f /app/requirements.txt ]; then pip install --no-cache-dir -r /app/requirements.txt; fi
 USER 1001
 
+ENV PORT=5055
 EXPOSE 5055
 
-# Start the Rasa Action Server
-CMD ["start"]
+CMD ["bash", "-lc", "rasa run actions --host 0.0.0.0 --port ${PORT}"]
