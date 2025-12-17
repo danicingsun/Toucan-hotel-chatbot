@@ -9,53 +9,41 @@ from datetime import datetime
 
 # Class to validate all form slots in separate methods
 class ValidateBookingForm(FormValidationAction):
-
     def name(self) -> Text:
         return "validate_booking_form"
 
-    # --- NAME ---
     def validate_name(self, slot_value, dispatcher, tracker, domain):
         if len(slot_value.split()) >= 1:
             return {"name": slot_value}
         dispatcher.utter_message(text="That doesn't look like a valid name. Please provide a full name.")
         return {"name": None}
 
-    # --- DATE FORMAT ---
-def validate_checkin(self, slot_value, dispatcher, tracker, domain):
-    try:
-        # Parse the string into a date object
-        checkin_date = datetime.datetime.strptime(slot_value, "%Y-%m-%d").date()
-        today = datetime.date.today()
-
-        # Ensure the date is after today
-        if checkin_date <= today:
-            dispatcher.utter_message(
-                text="Check-in must be a future date after today. Please provide a valid date."
-            )
+    def validate_checkin(self, slot_value, dispatcher, tracker, domain):
+        try:
+            checkin_date = datetime.strptime(slot_value, "%Y-%m-%d").date()
+            today = datetime.today().date()
+            if checkin_date <= today:
+                dispatcher.utter_message(text="Check-in must be a future date.")
+                return {"checkin": None}
+            return {"checkin": slot_value}
+        except ValueError:
+            dispatcher.utter_message(text="Enter a valid check-in date (YYYY-MM-DD).")
             return {"checkin": None}
 
-        # If format is valid and date is in the future
-        return {"checkin": slot_value}
-
-    except ValueError:
-        # If parsing fails, the format is wrong
-        dispatcher.utter_message(
-            text="Please enter a valid check-in date in format YYYY-MM-DD."
-        )
-        return {"checkin": None}
     def validate_checkout(self, slot_value, dispatcher, tracker, domain):
-      if self.valid_date(slot_value):
-        checkin = tracker.get_slot("checkin")
-        checkout_date = datetime.strptime(slot_value, "%Y-%m-%d")
-        if checkin:
-            checkin_date = datetime.strptime(checkin, "%Y-%m-%d")
-            if checkout_date <= checkin_date:
-                dispatcher.utter_message(text="Checkout must be after check-in.")
-                return {"checkout": None}
+        try:
+            checkout_date = datetime.strptime(slot_value, "%Y-%m-%d").date()
+            checkin = tracker.get_slot("checkin")
+            if checkin:
+                checkin_date = datetime.strptime(checkin, "%Y-%m-%d").date()
+                if checkout_date <= checkin_date:
+                    dispatcher.utter_message(text="Checkout must be after check-in.")
+                    return {"checkout": None}
             return {"checkout": slot_value}
-        return {"checkout": slot_value}
-      dispatcher.utter_message(text="Please enter checkout in YYYY-MM-DD format.")
-      return {"checkout": None}
+        except ValueError:
+            dispatcher.utter_message(text="Enter a valid checkout date (YYYY-MM-DD).")
+            return {"checkout": None}
+
 
     # --- GUESTS ---
     def validate_guests(self, slot_value, dispatcher, tracker, domain):
