@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const RASA_URL = "http://localhost:5005/webhooks/rest/webhook";
+const RASA_URL = "https://toucan-hotel-chatbot-llsu.onrender.com/webhooks/rest/webhook";
 
 /**
  * Send a message to Rasa REST webhook.
