@@ -11,4 +11,4 @@ USER 1001
 ENV PORT=5055
 EXPOSE 5055
 
-CMD ["bash", "-lc", "rasa run actions -i 0.0.0.0 --port ${PORT}"]
+CMD ["start", "--port==${PORT}", "-i 0.0.0.0"]
