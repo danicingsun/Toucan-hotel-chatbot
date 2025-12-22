@@ -221,7 +221,6 @@ nlu:
 
 - intent: out_of_scope
   examples: |
-    # Random unrelated questions / small talk
     - How are you doing?
     - What's your name?
     - Tell me a joke
@@ -299,8 +298,6 @@ nlu:
     - I am sleepy
     - Can you tell me a secret?
     - This is confusing
-
-    # Booking-related but invalid questions or extra info
     - Can I book two rooms for tonight?
     - I want a room with a sea view, do you have one?
     - Can you give me a discount?
