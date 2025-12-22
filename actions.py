@@ -49,7 +49,7 @@ class ValidateBookingForm(FormValidationAction):
 
             return {"checkin": value}
         except ValueError:
-            dispatcher.utter_message(text="Enter check-in date as YYYY-MM-DD.")
+            dispatcher.utter_message(text="Enter check-in date in the following format YYYY-MM-DD.")
             return {"checkin": None}
 
     # -------- CHECK-OUT --------
@@ -74,7 +74,7 @@ class ValidateBookingForm(FormValidationAction):
 
             return {"checkout": value}
         except ValueError:
-            dispatcher.utter_message(text="Enter checkout date as YYYY-MM-DD.")
+            dispatcher.utter_message(text="Enter checkout date in the following format YYYY-MM-DD.")
             return {"checkout": None}
 
     # -------- GUESTS --------
@@ -85,11 +85,12 @@ class ValidateBookingForm(FormValidationAction):
         tracker: Tracker,
         domain: DomainDict,
     ) -> Dict[Text, Any]:
-        if value.isdigit() and int(value) > 0:
+        if value.isdigit() and int(value) > 0 and int(value)<5:
             return {"guests": value}
-        dispatcher.utter_message(text="Please enter a valid number of guests.")
+        dispatcher.utter_message(text="Please enter a valid number of guests. Please note that you can book only one room a time and children above 2 year old need to be in their own bed and count as a guest. For children under 2 years old reception will be happy to provide a cot at arrival time.")
         return {"guests": None}
 
+    # -------- ROOM TYPE --------
     # -------- ROOM TYPE --------
     def validate_room_type(
         self,
@@ -98,15 +99,74 @@ class ValidateBookingForm(FormValidationAction):
         tracker: Tracker,
         domain: DomainDict,
     ) -> Dict[Text, Any]:
-        allowed = ["single", "double", "suite"]
-        norm = value.lower()
-        if norm in allowed:
-            return {"room_type": norm}
-        dispatcher.utter_message(
-            text="Room types available: single, double, suite."
-        )
-        return {"room_type": None}
 
+        # Sanity check: empty input
+        if not value:
+            return {"room_type": None}
+
+        room_type = value.strip().lower()
+        allowed = ["single", "double", "suite"]
+
+        guests_raw = tracker.get_slot("guests")
+
+        # Sanity check: guests must be a number
+        try:
+            guests = int(guests_raw)
+        except (TypeError, ValueError):
+            dispatcher.utter_message(
+                text="I couldn't understand the number of guests. Let's try that again."
+            )
+            return {
+                "room_type": None,
+                "guests": None,
+                "requested_slot": "guests",
+            }
+
+        # Absolute guest limit (restart form at guests)
+        if guests > 4:
+            dispatcher.utter_message(
+                text=(
+                    "Sorry, we can only accommodate up to 4 guests per booking. "
+                    "Please enter a smaller number of guests."
+                )
+            )
+            return {
+                "room_type": None,
+                "guests": None,
+                "requested_slot": "guests",
+            }
+
+        # Capacity per room type
+        capacity = {
+            "single": 1,
+            "double": 2,
+            "suite": 4,
+        }
+
+        # Invalid room type
+        if room_type not in allowed:
+            dispatcher.utter_message(
+                text="Room types available are single, double, or suite."
+            )
+            return {"room_type": None}
+
+        # Room capacity exceeded → ask for room type again
+        if guests > capacity[room_type]:
+            dispatcher.utter_message(
+                text=(
+                    f"A {room_type} room can accommodate up to "
+                    f"{capacity[room_type]} guest(s). "
+                    "Please choose another room type or change the number of guests."
+                )
+            )
+            return {
+                "room_type": None,
+                "requested_slot": "room_type",
+            }
+
+        # Valid selection
+        return {"room_type": room_type}
+ 
     # -------- BREAKFAST --------
     def validate_breakfast(
         self,
@@ -139,9 +199,9 @@ class ValidateBookingForm(FormValidationAction):
         if "credit" in norm:
             return {"payment": "credit card"}
         if "paypal" in norm:
-            return {"payment": "paypal"}
+            return {"payment": "cash"}
         dispatcher.utter_message(
-            text="Payment options are credit card or PayPal."
+            text="Payment options are credit card or cash."
         )
         return {"payment": None}
 

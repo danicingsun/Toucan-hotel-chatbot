@@ -161,25 +161,25 @@ responses:
     - text: "Would you like breakfast included {name}? (yes/no)"
       buttons:
         - title: "✅ YES"
-          payload: '/provide_breakfast{"breakfast":"yes"}'
+          payload: "yes"
         - title: "❌ NO"
-          payload: '/provide_breakfast{"breakfast":"no"}'
+          payload: "no"
 
   utter_ask_payment:
-    - text: "What payment method do you prefer {name}? (credit card / paypal)"
+    - text: "What payment method do you prefer {name}? (credit card / cash)"
       buttons:
         - title: "Credit card"
-          payload: '/provide_payment{"payment":"credit card"}'
-        - title: "Paypal"
-          payload: '/provide_payment{"payment":"paypal"}'
+          payload: "credit card"
+        - title: "Cash"
+          payload: "cash"
   
   utter_ask_refund:
     - text: "Do you prefer a refundable or non-refundable rate?"
       buttons:
         - title: "Refundable"
-          payload: '/provide_refund{"refund":"refundable"}'
+          payload: "refundable"
         - title: "Non-refundable"
-          payload: '/provide_refund{"refund":"non-refundable"}'
+          payload: "non-refundable"
 
   utter_summary:
     - text: |

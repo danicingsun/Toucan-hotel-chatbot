@@ -33,7 +33,3 @@ policies:
   epochs: 200
 assistant_id: 20251129-170033-ecru-convection
 
-# -------- THIS FIXES THE SQLITE readonly ERROR --------
-engine:
-  cache:
-    enable_cache: false

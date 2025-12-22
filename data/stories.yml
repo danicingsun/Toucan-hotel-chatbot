@@ -2,13 +2,15 @@ version: "3.1"
 
 stories:
 
+
+
 - story: Affirm confirmation
   steps:
     - intent: book_hotel
     - action: booking_form
     - active_loop: booking_form
     - intent: affirm
-    - action: action_submit_booking   # confirms + resets slots
+    - action: action_submit_booking   # confirms + resets slot'
 
 - story: Deny confirmation
   steps:

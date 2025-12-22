@@ -196,15 +196,15 @@ nlu:
 - intent: provide_payment
   examples: |
     - Pay with [credit card](payment)
-    - Use [paypal](payment)
+    - Use [cash](payment)
     - [credit card](payment)
-    - [paypal](payment)
+    - [cash](payment)
     - Payment by [credit card](payment)
-    - I’ll pay with [paypal](payment)
+    - I’ll pay with [cash](payment)
     - Charge my [credit card](payment)
-    - Use [paypal](payment) for payment
+    - Use [cash](payment) for payment
     - [credit card](payment) option
-    - [paypal](payment) method
+    - [cash](payment) method
 
 - intent: provide_refund
   examples: |
