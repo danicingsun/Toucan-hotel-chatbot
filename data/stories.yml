@@ -20,3 +20,14 @@ stories:
     - intent: deny
     - action: action_cancel_booking   # cancels + resets slots
     - action: action_deactivate_loop
+
+- story: Cancel booking mid-form
+  steps:
+    - intent: book_hotel
+    - action: booking_form
+    - active_loop: booking_form
+    - intent: stop
+    - action: action_cancel_booking
+    - action: utter_goodbye
+    - action: action_deactivate_loop
+    - active_loop: null
