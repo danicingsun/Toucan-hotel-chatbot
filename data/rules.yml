@@ -27,3 +27,12 @@ rules:
     - action: action_cancel_booking   # cancels + resets slots
     - action: action_deactivate_loop
     - active_loop: null
+
+- rule: Cancel booking anytime
+  condition:
+    - active_loop: booking_form
+  steps:
+    - intent: stop
+    - action: action_cancel_booking
+    - action: utter_goodbye
+    - active_loop: null
