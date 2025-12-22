@@ -156,7 +156,7 @@ responses:
     - text: "How many guests will be staying?"
 
   utter_ask_room_type:
-    - text: "What type of room would you prefer {name}? (single, double, suite)"
+    - text: "What type of room would you prefer {name}? (single, double, triple, suite)"
 
   utter_ask_breakfast:
     - text: "Would you like breakfast included {name}? (yes/no)"

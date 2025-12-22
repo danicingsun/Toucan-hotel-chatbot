@@ -105,7 +105,7 @@ class ValidateBookingForm(FormValidationAction):
             return {"room_type": None}
 
         room_type = value.strip().lower()
-        allowed = ["single", "double", "suite"]
+        allowed = ["single", "double", "triple", "suite"]
 
         guests_raw = tracker.get_slot("guests")
 
@@ -140,13 +140,14 @@ class ValidateBookingForm(FormValidationAction):
         capacity = {
             "single": 1,
             "double": 2,
+            "triple": 3,
             "suite": 4,
         }
 
         # Invalid room type
         if room_type not in allowed:
             dispatcher.utter_message(
-                text="Room types available are single, double, or suite."
+                text="Room types available are single, double, triple or suite."
             )
             return {"room_type": None}
 
@@ -156,7 +157,7 @@ class ValidateBookingForm(FormValidationAction):
                 text=(
                     f"A {room_type} room can accommodate up to "
                     f"{capacity[room_type]} guest(s). "
-                    "Please choose another room type or change the number of guests."
+                    "Please choose another room type. Room types available are single, double, triple or suite."
                 )
             )
             return {
@@ -198,7 +199,7 @@ class ValidateBookingForm(FormValidationAction):
         norm = value.lower()
         if "credit" in norm:
             return {"payment": "credit card"}
-        if "paypal" in norm:
+        if "cash" in norm:
             return {"payment": "cash"}
         dispatcher.utter_message(
             text="Payment options are credit card or cash."
