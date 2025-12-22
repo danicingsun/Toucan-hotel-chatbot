@@ -6,6 +6,7 @@ intents:
   - stop
   - affirm
   - deny
+  - out_of_scope
   - provide_name
   - provide_checkin
   - provide_checkout
@@ -180,6 +181,9 @@ responses:
           payload: "refundable"
         - title: "Non-refundable"
           payload: "non-refundable"
+
+  utter_out_of_scope:
+    - text: "I am not sure I understand what you mean. I am here to help with your booking only, so let's continue."
 
   utter_summary:
     - text: |

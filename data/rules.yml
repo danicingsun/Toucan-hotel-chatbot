@@ -36,3 +36,12 @@ rules:
     - action: action_cancel_booking
     - action: utter_goodbye
     - active_loop: null
+
+- rule: Out of scope during booking
+  condition:
+    - active_loop: booking_form
+  steps:
+    - intent: out_of_scope
+    - action: utter_out_of_scope
+    - action: booking_form
+    - active_loop: booking_form
