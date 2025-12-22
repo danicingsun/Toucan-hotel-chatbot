@@ -359,17 +359,34 @@ class ActionCancelBooking(Action):
         domain: Dict[Text, Any],
     ) -> List[Dict[Text, Any]]:
 
-        dispatcher.utter_message(
-            text="Your booking has been cancelled."
+        has_booking = any(
+            tracker.get_slot(slot)
+            for slot in [
+                "name",
+                "checkin",
+                "checkout",
+                "guests",
+                "room_type",
+            ]
         )
 
-        return [SlotSet(slot, None) for slot in [
-            "name",
-            "checkin",
-            "checkout",
-            "guests",
-            "room_type",
-            "breakfast",
-            "payment",
-            "refund",
-        ]]
+        if not has_booking:
+            dispatcher.utter_message(
+                text="You don’t have an active booking to cancel."
+            )
+            return []
+
+        dispatcher.utter_message(
+            text="Your booking has been cancelled. All details were cleared."
+        )
+
+        return [
+            SlotSet("name", None),
+            SlotSet("checkin", None),
+            SlotSet("checkout", None),
+            SlotSet("guests", None),
+            SlotSet("room_type", None),
+            SlotSet("breakfast", None),
+            SlotSet("payment", None),
+            SlotSet("refund", None),
+        ]

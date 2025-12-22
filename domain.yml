@@ -207,6 +207,9 @@ responses:
   utter_goodbye:
     - text: "Okay, booking cancelled. Let me know if you need anything else."
 
+  utter_no_active_booking:
+    - text: "You don’t have an active booking to cancel."
+
 actions:
   - validate_booking_form
   - action_submit_booking
