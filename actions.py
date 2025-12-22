@@ -1,12 +1,51 @@
-from typing import Any, Text, Dict, List
+from typing import Any, Text, Dict, List, Optional
 
 from rasa_sdk import Action, Tracker
-from rasa_sdk.events import SlotSet
 from rasa_sdk.executor import CollectingDispatcher
-from rasa_sdk.types import DomainDict
 from rasa_sdk.forms import FormValidationAction
+from rasa_sdk.events import SlotSet
+from rasa_sdk.types import DomainDict
 
 from datetime import datetime
+
+
+# =========================================================
+# CONSTANTS & HELPERS
+# =========================================================
+
+DATE_FORMAT = "%Y-%m-%d"
+MAX_GUESTS = 4
+
+ROOM_CAPACITY = {
+    "single": 1,
+    "double": 2,
+    "triple": 3,
+    "suite": 4,
+}
+
+YES_VALUES = {"yes", "y", "true"}
+NO_VALUES = {"no", "n", "false"}
+
+
+def normalize_text(value: Optional[Text]) -> Optional[Text]:
+    return value.strip().lower() if value else None
+
+
+def has_active_booking(tracker: Tracker) -> bool:
+    """Check whether any booking-related slot is filled."""
+    return any(
+        tracker.get_slot(slot)
+        for slot in [
+            "name",
+            "checkin",
+            "checkout",
+            "guests",
+            "room_type",
+            "breakfast",
+            "payment",
+            "refund",
+        ]
+    )
 
 
 # =========================================================
@@ -18,6 +57,41 @@ class ValidateBookingForm(FormValidationAction):
     def name(self) -> Text:
         return "validate_booking_form"
 
+    # -------- GLOBAL INTERRUPTS (cancel / stop) --------
+    def validate(
+        self,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: DomainDict,
+    ) -> Dict[Text, Any]:
+
+        intent = tracker.latest_message.get("intent", {}).get("name")
+
+        if intent == "stop":
+            if not has_active_booking(tracker):
+                dispatcher.utter_message(
+                    text="There is no active booking to cancel."
+                )
+                return {"requested_slot": None}
+
+            dispatcher.utter_message(
+                text="Your booking has been cancelled. All details were cleared."
+            )
+            return {
+                "requested_slot": None,
+                "active_loop": None,
+                "name": None,
+                "checkin": None,
+                "checkout": None,
+                "guests": None,
+                "room_type": None,
+                "breakfast": None,
+                "payment": None,
+                "refund": None,
+            }
+
+        return {}
+
     # -------- NAME --------
     def validate_name(
         self,
@@ -26,8 +100,11 @@ class ValidateBookingForm(FormValidationAction):
         tracker: Tracker,
         domain: DomainDict,
     ) -> Dict[Text, Any]:
-        if value and len(value.strip()) > 0:
-            return {"name": value.strip()}
+
+        name = value.strip() if value else None
+        if name:
+            return {"name": name}
+
         dispatcher.utter_message(text="Please provide a valid name.")
         return {"name": None}
 
@@ -39,17 +116,23 @@ class ValidateBookingForm(FormValidationAction):
         tracker: Tracker,
         domain: DomainDict,
     ) -> Dict[Text, Any]:
+
         try:
-            checkin_date = datetime.strptime(value, "%Y-%m-%d").date()
+            checkin_date = datetime.strptime(value, DATE_FORMAT).date()
             today = datetime.today().date()
 
             if checkin_date <= today:
-                dispatcher.utter_message(text="Check-in must be a future date.")
+                dispatcher.utter_message(
+                    text="Check-in must be a future date."
+                )
                 return {"checkin": None}
 
             return {"checkin": value}
-        except ValueError:
-            dispatcher.utter_message(text="Enter check-in date in the following format YYYY-MM-DD.")
+
+        except Exception:
+            dispatcher.utter_message(
+                text="Please enter the check-in date in YYYY-MM-DD format."
+            )
             return {"checkin": None}
 
     # -------- CHECK-OUT --------
@@ -60,21 +143,28 @@ class ValidateBookingForm(FormValidationAction):
         tracker: Tracker,
         domain: DomainDict,
     ) -> Dict[Text, Any]:
-        try:
-            checkout_date = datetime.strptime(value, "%Y-%m-%d").date()
-            checkin = tracker.get_slot("checkin")
 
-            if checkin:
-                checkin_date = datetime.strptime(checkin, "%Y-%m-%d").date()
+        try:
+            checkout_date = datetime.strptime(value, DATE_FORMAT).date()
+            checkin_value = tracker.get_slot("checkin")
+
+            if checkin_value:
+                checkin_date = datetime.strptime(
+                    checkin_value, DATE_FORMAT
+                ).date()
+
                 if checkout_date <= checkin_date:
                     dispatcher.utter_message(
-                        text="Checkout must be after the check-in date."
+                        text="Check-out must be after the check-in date."
                     )
                     return {"checkout": None}
 
             return {"checkout": value}
-        except ValueError:
-            dispatcher.utter_message(text="Enter checkout date in the following format YYYY-MM-DD.")
+
+        except Exception:
+            dispatcher.utter_message(
+                text="Please enter the check-out date in YYYY-MM-DD format."
+            )
             return {"checkout": None}
 
     # -------- GUESTS --------
@@ -85,12 +175,24 @@ class ValidateBookingForm(FormValidationAction):
         tracker: Tracker,
         domain: DomainDict,
     ) -> Dict[Text, Any]:
-        if value.isdigit() and int(value) > 0 and int(value)<5:
-            return {"guests": value}
-        dispatcher.utter_message(text="Please enter a valid number of guests. Please note that you can book only one room a time and children above 2 year old need to be in their own bed and count as a guest. For children under 2 years old reception will be happy to provide a cot at arrival time.")
+
+        try:
+            guests = int(value)
+            if 1 <= guests <= MAX_GUESTS:
+                return {"guests": str(guests)}
+
+        except Exception:
+            pass
+
+        dispatcher.utter_message(
+            text=(
+                "Please enter a valid number of guests (1–4). "
+                "Only one room can be booked at a time. "
+                "Children over 2 years count as guests."
+            )
+        )
         return {"guests": None}
 
-    # -------- ROOM TYPE --------
     # -------- ROOM TYPE --------
     def validate_room_type(
         self,
@@ -100,21 +202,15 @@ class ValidateBookingForm(FormValidationAction):
         domain: DomainDict,
     ) -> Dict[Text, Any]:
 
-        # Sanity check: empty input
-        if not value:
-            return {"room_type": None}
-
-        room_type = value.strip().lower()
-        allowed = ["single", "double", "triple", "suite"]
-
+        room_type = normalize_text(value)
         guests_raw = tracker.get_slot("guests")
 
-        # Sanity check: guests must be a number
+        # Validate guests first
         try:
             guests = int(guests_raw)
-        except (TypeError, ValueError):
+        except Exception:
             dispatcher.utter_message(
-                text="I couldn't understand the number of guests. Let's try that again."
+                text="Let's confirm the number of guests first."
             )
             return {
                 "room_type": None,
@@ -122,13 +218,10 @@ class ValidateBookingForm(FormValidationAction):
                 "requested_slot": "guests",
             }
 
-        # Absolute guest limit (restart form at guests)
-        if guests > 4:
+        # Absolute limit safety net
+        if guests > MAX_GUESTS:
             dispatcher.utter_message(
-                text=(
-                    "Sorry, we can only accommodate up to 4 guests per booking. "
-                    "Please enter a smaller number of guests."
-                )
+                text="We can accommodate up to 4 guests per booking."
             )
             return {
                 "room_type": None,
@@ -136,38 +229,24 @@ class ValidateBookingForm(FormValidationAction):
                 "requested_slot": "guests",
             }
 
-        # Capacity per room type
-        capacity = {
-            "single": 1,
-            "double": 2,
-            "triple": 3,
-            "suite": 4,
-        }
-
-        # Invalid room type
-        if room_type not in allowed:
+        if room_type not in ROOM_CAPACITY:
             dispatcher.utter_message(
-                text="Room types available are single, double, triple or suite."
+                text="Available room types are single, double, triple, or suite."
             )
             return {"room_type": None}
 
-        # Room capacity exceeded → ask for room type again
-        if guests > capacity[room_type]:
+        if guests > ROOM_CAPACITY[room_type]:
             dispatcher.utter_message(
                 text=(
-                    f"A {room_type} room can accommodate up to "
-                    f"{capacity[room_type]} guest(s). "
-                    "Please choose another room type. Room types available are single, double, triple or suite."
+                    f"A {room_type} room can host up to "
+                    f"{ROOM_CAPACITY[room_type]} guest(s). "
+                    "Please choose another room type."
                 )
             )
-            return {
-                "room_type": None,
-                "requested_slot": "room_type",
-            }
+            return {"room_type": None}
 
-        # Valid selection
         return {"room_type": room_type}
- 
+
     # -------- BREAKFAST --------
     def validate_breakfast(
         self,
@@ -176,13 +255,12 @@ class ValidateBookingForm(FormValidationAction):
         tracker: Tracker,
         domain: DomainDict,
     ) -> Dict[Text, Any]:
-        if not value:
-            return {"breakfast": None}
 
-        norm = value.strip().lower()
-        if norm in ["yes", "y", "true"]:
+        norm = normalize_text(value)
+
+        if norm in YES_VALUES:
             return {"breakfast": "yes"}
-        if norm in ["no", "n", "false"]:
+        if norm in NO_VALUES:
             return {"breakfast": "no"}
 
         dispatcher.utter_message(text="Please answer yes or no.")
@@ -196,11 +274,14 @@ class ValidateBookingForm(FormValidationAction):
         tracker: Tracker,
         domain: DomainDict,
     ) -> Dict[Text, Any]:
-        norm = value.lower()
+
+        norm = normalize_text(value)
+
         if "credit" in norm:
             return {"payment": "credit card"}
         if "cash" in norm:
             return {"payment": "cash"}
+
         dispatcher.utter_message(
             text="Payment options are credit card or cash."
         )
@@ -214,9 +295,12 @@ class ValidateBookingForm(FormValidationAction):
         tracker: Tracker,
         domain: DomainDict,
     ) -> Dict[Text, Any]:
-        norm = value.lower()
-        if norm in ["refundable", "non-refundable", "nonrefundable"]:
+
+        norm = normalize_text(value)
+
+        if norm in {"refundable", "non-refundable", "nonrefundable"}:
             return {"refund": norm}
+
         dispatcher.utter_message(
             text="Please choose refundable or non-refundable."
         )
@@ -241,25 +325,22 @@ class ActionSubmitBooking(Action):
 
         name = tracker.get_slot("name")
 
-        if name:
-            dispatcher.utter_message(
-                text=f"Thank you {name}, your booking has been confirmed! 🎉"
-            )
-        else:
-            dispatcher.utter_message(
-                text="Your booking has been confirmed! 🎉"
-            )
+        dispatcher.utter_message(
+            text=f"Thank you {name}, your booking has been confirmed! 🎉"
+            if name
+            else "Your booking has been confirmed! 🎉"
+        )
 
-        return [
-            SlotSet("name", None),
-            SlotSet("checkin", None),
-            SlotSet("checkout", None),
-            SlotSet("guests", None),
-            SlotSet("room_type", None),
-            SlotSet("breakfast", None),
-            SlotSet("payment", None),
-            SlotSet("refund", None),
-        ]
+        return [SlotSet(slot, None) for slot in [
+            "name",
+            "checkin",
+            "checkout",
+            "guests",
+            "room_type",
+            "breakfast",
+            "payment",
+            "refund",
+        ]]
 
 
 # =========================================================
@@ -279,16 +360,16 @@ class ActionCancelBooking(Action):
     ) -> List[Dict[Text, Any]]:
 
         dispatcher.utter_message(
-            text="Your booking has been cancelled. All details were cleared."
+            text="Your booking has been cancelled."
         )
 
-        return [
-            SlotSet("name", None),
-            SlotSet("checkin", None),
-            SlotSet("checkout", None),
-            SlotSet("guests", None),
-            SlotSet("room_type", None),
-            SlotSet("breakfast", None),
-            SlotSet("payment", None),
-            SlotSet("refund", None),
-        ]
+        return [SlotSet(slot, None) for slot in [
+            "name",
+            "checkin",
+            "checkout",
+            "guests",
+            "room_type",
+            "breakfast",
+            "payment",
+            "refund",
+        ]]
