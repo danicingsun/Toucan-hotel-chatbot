@@ -47,6 +47,33 @@ def has_active_booking(tracker: Tracker) -> bool:
         ]
     )
 
+#Helper function to interrupt the form if user start chitchat or asks a question
+def interrupt_if_cancelled(
+    dispatcher: CollectingDispatcher,
+    tracker: Tracker,
+) -> Optional[Dict[Text, Any]]:
+
+    intent = tracker.latest_message.get("intent", {}).get("name")
+
+    if intent == "stop":
+        dispatcher.utter_message(
+            text="I am not sure I understand you. I will cancel the booking and if that was not your intent, I can help you start over."
+        )
+        return {
+            "requested_slot": None,
+            "active_loop": None,
+            "name": None,
+            "checkin": None,
+            "checkout": None,
+            "guests": None,
+            "room_type": None,
+            "breakfast": None,
+            "payment": None,
+            "refund": None,
+        }
+
+    return None
+
 
 # =========================================================
 # FORM VALIDATION
@@ -54,44 +81,11 @@ def has_active_booking(tracker: Tracker) -> bool:
 
 class ValidateBookingForm(FormValidationAction):
 
+
     def name(self) -> Text:
         return "validate_booking_form"
 
-    # -------- GLOBAL INTERRUPTS (cancel / stop) --------
-    def validate(
-        self,
-        dispatcher: CollectingDispatcher,
-        tracker: Tracker,
-        domain: DomainDict,
-    ) -> Dict[Text, Any]:
-
-        intent = tracker.latest_message.get("intent", {}).get("name")
-
-        if intent == "stop":
-            if not has_active_booking(tracker):
-                dispatcher.utter_message(
-                    text="There is no active booking to cancel."
-                )
-                return {"requested_slot": None}
-
-            dispatcher.utter_message(
-                text="Your booking has been cancelled. All details were cleared."
-            )
-            return {
-                "requested_slot": None,
-                "active_loop": None,
-                "name": None,
-                "checkin": None,
-                "checkout": None,
-                "guests": None,
-                "room_type": None,
-                "breakfast": None,
-                "payment": None,
-                "refund": None,
-            }
-
-        return {}
-
+ 
     # -------- NAME --------
     def validate_name(
         self,
@@ -100,7 +94,12 @@ class ValidateBookingForm(FormValidationAction):
         tracker: Tracker,
         domain: DomainDict,
     ) -> Dict[Text, Any]:
+        #Interrupt the form if user starts chitchat
+        interrupt = interrupt_if_cancelled(dispatcher, tracker)
+        if interrupt:
+        	return interrupt
 
+        #Check if user replied with a string
         name = value.strip() if value else None
         if name:
             return {"name": name}
@@ -116,11 +115,17 @@ class ValidateBookingForm(FormValidationAction):
         tracker: Tracker,
         domain: DomainDict,
     ) -> Dict[Text, Any]:
+	#Interrupt the form if user starts chitchat
+        interrupt = interrupt_if_cancelled(dispatcher, tracker)
+        if interrupt:
+        	return interrupt
 
+	#Continue with validation checks
         try:
             checkin_date = datetime.strptime(value, DATE_FORMAT).date()
             today = datetime.today().date()
-
+	    
+            #Make sure checkin is in the future
             if checkin_date <= today:
                 dispatcher.utter_message(
                     text="Check-in must be a future date."
@@ -143,11 +148,18 @@ class ValidateBookingForm(FormValidationAction):
         tracker: Tracker,
         domain: DomainDict,
     ) -> Dict[Text, Any]:
-
+	
+        #Interrupt the form if user starts chitchat
+        interrupt = interrupt_if_cancelled(dispatcher, tracker)
+        if interrupt:
+        	return interrupt
+	
+        #Continue with validation checks
         try:
             checkout_date = datetime.strptime(value, DATE_FORMAT).date()
             checkin_value = tracker.get_slot("checkin")
 
+            #Make sure checkout date is after checkin date
             if checkin_value:
                 checkin_date = datetime.strptime(
                     checkin_value, DATE_FORMAT
@@ -175,7 +187,14 @@ class ValidateBookingForm(FormValidationAction):
         tracker: Tracker,
         domain: DomainDict,
     ) -> Dict[Text, Any]:
-
+	
+        #Interrupt the form if user starts chitchat
+        interrupt = interrupt_if_cancelled(dispatcher, tracker)
+        if interrupt:
+        	return interrupt
+	
+        #Continue with validation checks
+        #Check the number of guests does not exceed the maximum, which is currently 4
         try:
             guests = int(value)
             if 1 <= guests <= MAX_GUESTS:
@@ -188,7 +207,7 @@ class ValidateBookingForm(FormValidationAction):
             text=(
                 "Please enter a valid number of guests (1–4). "
                 "Only one room can be booked at a time. "
-                "Children over 2 years count as guests."
+                "Children over 2 years count as guests. Children under 2 years are welcome to stay in a cot that can be picked up at reception at arrival time."
             )
         )
         return {"guests": None}
@@ -201,7 +220,13 @@ class ValidateBookingForm(FormValidationAction):
         tracker: Tracker,
         domain: DomainDict,
     ) -> Dict[Text, Any]:
-
+	
+        #Interrupt the form if user starts chitchat
+        interrupt = interrupt_if_cancelled(dispatcher, tracker)
+        if interrupt:
+        	return interrupt
+	
+        #Continue with validation checks
         room_type = normalize_text(value)
         guests_raw = tracker.get_slot("guests")
 
@@ -218,23 +243,13 @@ class ValidateBookingForm(FormValidationAction):
                 "requested_slot": "guests",
             }
 
-        # Absolute limit safety net
-        if guests > MAX_GUESTS:
-            dispatcher.utter_message(
-                text="We can accommodate up to 4 guests per booking."
-            )
-            return {
-                "room_type": None,
-                "guests": None,
-                "requested_slot": "guests",
-            }
-
         if room_type not in ROOM_CAPACITY:
             dispatcher.utter_message(
                 text="Available room types are single, double, triple, or suite."
             )
             return {"room_type": None}
-
+        
+        #Only allow room types that will fit all the guests in the booking
         if guests > ROOM_CAPACITY[room_type]:
             dispatcher.utter_message(
                 text=(
@@ -255,7 +270,13 @@ class ValidateBookingForm(FormValidationAction):
         tracker: Tracker,
         domain: DomainDict,
     ) -> Dict[Text, Any]:
-
+	
+        #Interrupt the form if user starts chitchat
+        interrupt = interrupt_if_cancelled(dispatcher, tracker)
+        if interrupt:
+        	return interrupt
+	
+        #Continue with validation checks - only yes or no are accepted
         norm = normalize_text(value)
 
         if norm in YES_VALUES:
@@ -274,12 +295,24 @@ class ValidateBookingForm(FormValidationAction):
         tracker: Tracker,
         domain: DomainDict,
     ) -> Dict[Text, Any]:
-
+	
+        #Interrupt the form if user starts chitchat
+        interrupt = interrupt_if_cancelled(dispatcher, tracker)
+        if interrupt:
+        	return interrupt
+	
+        #Continue with validation checks - only allow cash or credit card
         norm = normalize_text(value)
 
         if "credit" in norm:
+            dispatcher.utter_message(
+                text="We will expect payment by credit card at arrival time"
+            )
             return {"payment": "credit card"}
         if "cash" in norm:
+            dispatcher.utter_message(
+                text="We will expect cash payment at arrival time"
+            )
             return {"payment": "cash"}
 
         dispatcher.utter_message(
@@ -295,7 +328,13 @@ class ValidateBookingForm(FormValidationAction):
         tracker: Tracker,
         domain: DomainDict,
     ) -> Dict[Text, Any]:
-
+	
+        #Interrupt the form if user starts chitchat
+        interrupt = interrupt_if_cancelled(dispatcher, tracker)
+        if interrupt:
+        	return interrupt
+	
+        #Continue with validation checks - only refundable or non-refundable are accepted
         norm = normalize_text(value)
 
         if norm in {"refundable", "non-refundable", "nonrefundable"}:
@@ -326,9 +365,9 @@ class ActionSubmitBooking(Action):
         name = tracker.get_slot("name")
 
         dispatcher.utter_message(
-            text=f"Thank you {name}, your booking has been confirmed! 🎉"
+            text=f"Thank you {name}, your booking has been confirmed! 🎉 We look forward to welcoming you in our hotel. Could I help you with anything else today?"
             if name
-            else "Your booking has been confirmed! 🎉"
+            else "Your booking has been confirmed! 🎉 We look forward to welcoming you in our hotel. Could I help you with anything else today?"
         )
 
         return [SlotSet(slot, None) for slot in [
@@ -377,7 +416,7 @@ class ActionCancelBooking(Action):
             return []
 
         dispatcher.utter_message(
-            text="Your booking has been cancelled. All details were cleared."
+            text="Your booking has been cancelled. All details were cleared. Could I help you with anything else today?"
         )
 
         return [
