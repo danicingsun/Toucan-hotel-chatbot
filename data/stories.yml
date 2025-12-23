@@ -2,8 +2,6 @@ version: "3.1"
 
 stories:
 
-
-
 - story: Affirm confirmation
   steps:
     - intent: book_hotel

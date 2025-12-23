@@ -74,6 +74,16 @@ def interrupt_if_cancelled(
 
     return None
 
+#Function to check if all slots are filled yet
+def all_required_slots_filled(
+    tracker: Tracker,
+    domain: DomainDict,
+    form_name: Text = "booking_form",
+) -> bool:
+    required_slots = domain["forms"][form_name]["required_slots"]
+
+    return all(tracker.get_slot(slot) is not None for slot in required_slots)
+
 
 # =========================================================
 # FORM VALIDATION
@@ -359,27 +369,42 @@ class ActionSubmitBooking(Action):
         self,
         dispatcher: CollectingDispatcher,
         tracker: Tracker,
-        domain: Dict[Text, Any],
+        domain: DomainDict,
     ) -> List[Dict[Text, Any]]:
 
+        # Get required slots from domain
+        required_slots = domain["forms"]["booking_form"]["required_slots"]
+
+        missing_slots = [
+            slot for slot in required_slots
+            if not tracker.get_slot(slot)
+        ]
+
+        # Safety check — form should not submit if incomplete
+        if missing_slots:
+            dispatcher.utter_message(
+                text=(
+                    "Your booking is not complete yet. "
+                    "Let's finish the remaining details."
+                )
+            )
+            # Do NOT reset slots, do NOT confirm
+            return []
+
+        # All slots are filled → confirm booking
         name = tracker.get_slot("name")
 
         dispatcher.utter_message(
             text=f"Thank you {name}, your booking has been confirmed! 🎉 We look forward to welcoming you in our hotel. Could I help you with anything else today?"
-            if name
-            else "Your booking has been confirmed! 🎉 We look forward to welcoming you in our hotel. Could I help you with anything else today?"
+            if name else
+            "Your booking has been confirmed! 🎉 We look forward to welcoming you in our hotel. Could I help you with anything else today?"
         )
 
-        return [SlotSet(slot, None) for slot in [
-            "name",
-            "checkin",
-            "checkout",
-            "guests",
-            "room_type",
-            "breakfast",
-            "payment",
-            "refund",
-        ]]
+        # Clear booking slots after confirmation
+        return [
+            SlotSet(slot, None)
+            for slot in required_slots
+        ]
 
 
 # =========================================================

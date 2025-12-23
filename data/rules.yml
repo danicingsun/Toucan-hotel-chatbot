@@ -16,24 +16,10 @@ rules:
     - active_loop: null
     - action: utter_summary
 
-- rule: Confirm booking
-  steps:
-    - intent: affirm
-    - action: action_submit_booking   # confirms + resets slots
-
 - rule: Deny booking after summary
   steps:
     - intent: deny
     - action: action_cancel_booking
-
-- rule: Cancel booking while form is active
-  condition:
-    - active_loop: booking_form
-  steps:
-    - intent: stop
-    - action: action_cancel_booking
-    - action: action_deactivate_loop
-    - active_loop: null
 
 - rule: Cancel with no active booking
   condition:
@@ -42,11 +28,3 @@ rules:
   - intent: stop
   - action: utter_no_active_booking 
 
-- rule: Out of scope during booking
-  condition:
-    - active_loop: booking_form
-  steps:
-    - intent: out_of_scope
-    - action: utter_out_of_scope
-    - action: booking_form
-    - active_loop: booking_form
