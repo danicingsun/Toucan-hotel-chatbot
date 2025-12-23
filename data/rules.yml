@@ -14,7 +14,12 @@ rules:
   steps:
     - action: booking_form
     - active_loop: null
-    - action: utter_summary
+    - action: action_submit_booking
+
+- rule: Confirm booking after summary
+  steps:
+    - intent: affirm
+    - action: action_submit_booking_confirmed
 
 - rule: Deny booking after summary
   steps:

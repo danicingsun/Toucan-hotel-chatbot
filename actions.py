@@ -372,7 +372,6 @@ class ActionSubmitBooking(Action):
         domain: DomainDict,
     ) -> List[Dict[Text, Any]]:
 
-        # Get required slots from domain
         required_slots = domain["forms"]["booking_form"]["required_slots"]
 
         missing_slots = [
@@ -380,32 +379,55 @@ class ActionSubmitBooking(Action):
             if not tracker.get_slot(slot)
         ]
 
-        # Safety check — form should not submit if incomplete
+        # Safety net (rare but correct)
         if missing_slots:
             dispatcher.utter_message(
-                text=(
-                    "Your booking is not complete yet. "
-                    "Let's finish the remaining details."
-                )
+                text="Your booking is not complete yet. Let's finish it first."
             )
-            # Do NOT reset slots, do NOT confirm
             return []
 
-        # All slots are filled → confirm booking
+        # ONLY show summary and ask for confirmation
+        dispatcher.utter_message(template="utter_summary")
+        return []
+
+class ActionSubmitBookingConfirmed(Action):
+
+    def name(self) -> Text:
+        return "action_submit_booking_confirmed"
+
+    def run(
+        self,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: DomainDict,
+    ) -> List[Dict[Text, Any]]:
+
         name = tracker.get_slot("name")
 
+        # Final confirmation message
         dispatcher.utter_message(
-            text=f"Thank you {name}, your booking has been confirmed! 🎉 We look forward to welcoming you in our hotel. Could I help you with anything else today?"
+            text=(
+                f"Thank you {name}, your booking has been confirmed! 🎉 "
+                "We look forward to welcoming you. "
+                "If you need anything else, just let me know."
+            )
             if name else
-            "Your booking has been confirmed! 🎉 We look forward to welcoming you in our hotel. Could I help you with anything else today?"
+            "Your booking has been confirmed! 🎉 "
+            "We look forward to welcoming you. "
+            "If you need anything else, just let me know."
         )
 
-        # Clear booking slots after confirmation
+        # Clear all booking-related slots
         return [
-            SlotSet(slot, None)
-            for slot in required_slots
+            SlotSet("name", None),
+            SlotSet("checkin", None),
+            SlotSet("checkout", None),
+            SlotSet("guests", None),
+            SlotSet("room_type", None),
+            SlotSet("breakfast", None),
+            SlotSet("payment", None),
+            SlotSet("refund", None),
         ]
-
 
 # =========================================================
 # CANCEL BOOKING
