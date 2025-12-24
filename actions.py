@@ -141,7 +141,7 @@ class ValidateBookingForm(FormValidationAction):
                     text="Check-in must be a future date."
                 )
                 return {"checkin": None}
-	    dispatcher.utter_message(text="Checkin date is {value}.")
+            dispatcher.utter_message(text="Checkin date is {value}.")
             return {"checkin": value}
 
         except Exception:
@@ -180,7 +180,7 @@ class ValidateBookingForm(FormValidationAction):
                         text="Check-out must be after the check-in date."
                     )
                     return {"checkout": None}
-	    dispatcher.utter_message(text="Checkout date is {value}.")
+            dispatcher.utter_message(text="Checkout date is {value}.")
             return {"checkout": value}
 
         except Exception:
