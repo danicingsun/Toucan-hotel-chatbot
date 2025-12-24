@@ -388,44 +388,8 @@ class ActionSubmitBooking(Action):
 
         return [
             SlotSet("booking_ready", True)
-        ]class ActionSubmitBookingConfirmed(Action):
-
-    def name(self) -> Text:
-        return "action_submit_booking_confirmed"
-
-    def run(
-        self,
-        dispatcher: CollectingDispatcher,
-        tracker: Tracker,
-        domain: DomainDict,
-    ) -> List[Dict[Text, Any]]:
-
-        name = tracker.get_slot("name")
-
-        # Final confirmation message
-        dispatcher.utter_message(
-            text=(
-                f"Thank you {name}, your booking has been confirmed! 🎉 "
-                "We look forward to welcoming you. "
-                "If you need anything else, just let me know."
-            )
-            if name else
-            "Your booking has been confirmed! 🎉 "
-            "We look forward to welcoming you. "
-            "If you need anything else, just let me know."
-        )
-
-        # Clear all booking-related slots
-        return [
-            SlotSet("name", None),
-            SlotSet("checkin", None),
-            SlotSet("checkout", None),
-            SlotSet("guests", None),
-            SlotSet("room_type", None),
-            SlotSet("breakfast", None),
-            SlotSet("payment", None),
-            SlotSet("refund", None),
         ]
+
 
 class ActionSubmitBookingConfirmed(Action):
 
@@ -446,9 +410,9 @@ class ActionSubmitBookingConfirmed(Action):
         name = tracker.get_slot("name")
 
         dispatcher.utter_message(
-            text=f"Thank you {name}, your booking has been confirmed! 🎉"
+            text=f"Thank you {name}, your booking has been confirmed! 🎉 We look forward to welcoming you. If you need anything else, just let me know."
             if name else
-            "Your booking has been confirmed! 🎉"
+            "Your booking has been confirmed! 🎉 We look forward to welcoming you. If you need anything else, just let me know."
         )
 
         return [
