@@ -141,7 +141,7 @@ class ValidateBookingForm(FormValidationAction):
                     text="Check-in must be a future date."
                 )
                 return {"checkin": None}
-
+	    dispatcher.utter_message(text="Checkin date is {value}.")
             return {"checkin": value}
 
         except Exception:
@@ -180,7 +180,7 @@ class ValidateBookingForm(FormValidationAction):
                         text="Check-out must be after the check-in date."
                     )
                     return {"checkout": None}
-
+	    dispatcher.utter_message(text="Checkout date is {value}.")
             return {"checkout": value}
 
         except Exception:
@@ -208,6 +208,7 @@ class ValidateBookingForm(FormValidationAction):
         try:
             guests = int(value)
             if 1 <= guests <= MAX_GUESTS:
+                dispatcher.utter_message(text="So let's book a room for {guests} people.")
                 return {"guests": str(guests)}
 
         except Exception:
@@ -269,7 +270,7 @@ class ValidateBookingForm(FormValidationAction):
                 )
             )
             return {"room_type": None}
-
+        dispatcher.utter_message(text="You have selected a {room_type} room for your booking.")
         return {"room_type": room_type}
 
     # -------- BREAKFAST --------
@@ -290,8 +291,10 @@ class ValidateBookingForm(FormValidationAction):
         norm = normalize_text(value)
 
         if norm in YES_VALUES:
+            dispatcher.utter_message(text="I will add breakfast to your booking, no problem.")
             return {"breakfast": "yes"}
         if norm in NO_VALUES:
+            dispatcher.utter_message(text="No breakfast will be included in the booking then.")
             return {"breakfast": "no"}
 
         dispatcher.utter_message(text="Please answer yes or no.")
