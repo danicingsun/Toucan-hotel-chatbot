@@ -372,6 +372,11 @@ class ActionSubmitBooking(Action):
         domain: DomainDict,
     ) -> List[Dict[Text, Any]]:
 
+        # If user cancelled or interrupted, DO NOTHING
+        latest_intent = tracker.latest_message.get("intent", {}).get("name")
+        if latest_intent == "stop":
+            return []
+
         required_slots = domain["forms"]["booking_form"]["required_slots"]
 
         missing_slots = [
@@ -379,14 +384,11 @@ class ActionSubmitBooking(Action):
             if not tracker.get_slot(slot)
         ]
 
-        # Safety net (rare but correct)
+        # HARD GUARD: do not show summary unless booking is complete
         if missing_slots:
-            dispatcher.utter_message(
-                text="Your booking is not complete yet. Let's finish it first."
-            )
             return []
 
-        # ONLY show summary and ask for confirmation
+        # Only here show the summary
         dispatcher.utter_message(template="utter_summary")
         return []
 
