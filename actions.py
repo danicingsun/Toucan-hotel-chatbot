@@ -372,27 +372,20 @@ class ActionSubmitBooking(Action):
         domain: DomainDict,
     ) -> List[Dict[Text, Any]]:
 
-        # If user cancelled or interrupted, DO NOTHING
-        latest_intent = tracker.latest_message.get("intent", {}).get("name")
-        if latest_intent == "stop":
+        # Prevent accidental submit after interruption
+        if tracker.latest_message.get("intent", {}).get("name") == "stop":
             return []
 
         required_slots = domain["forms"]["booking_form"]["required_slots"]
 
-        missing_slots = [
-            slot for slot in required_slots
-            if not tracker.get_slot(slot)
-        ]
-
-        # HARD GUARD: do not show summary unless booking is complete
-        if missing_slots:
+        if any(tracker.get_slot(slot) is None for slot in required_slots):
             return []
 
-        # Only here show the summary
         dispatcher.utter_message(template="utter_summary")
-        return []
 
-class ActionSubmitBookingConfirmed(Action):
+        return [
+            SlotSet("booking_ready", True)
+        ]class ActionSubmitBookingConfirmed(Action):
 
     def name(self) -> Text:
         return "action_submit_booking_confirmed"
@@ -431,6 +424,42 @@ class ActionSubmitBookingConfirmed(Action):
             SlotSet("refund", None),
         ]
 
+class ActionSubmitBookingConfirmed(Action):
+
+    def name(self) -> Text:
+        return "action_submit_booking_confirmed"
+
+    def run(
+        self,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: DomainDict,
+    ) -> List[Dict[Text, Any]]:
+
+        if not tracker.get_slot("booking_ready"):
+            dispatcher.utter_message(text="There is no booking to confirm.")
+            return []
+
+        name = tracker.get_slot("name")
+
+        dispatcher.utter_message(
+            text=f"Thank you {name}, your booking has been confirmed! 🎉"
+            if name else
+            "Your booking has been confirmed! 🎉"
+        )
+
+        return [
+            SlotSet("name", None),
+            SlotSet("checkin", None),
+            SlotSet("checkout", None),
+            SlotSet("guests", None),
+            SlotSet("room_type", None),
+            SlotSet("breakfast", None),
+            SlotSet("payment", None),
+            SlotSet("refund", None),
+            SlotSet("booking_ready", None),
+        ]
+
 # =========================================================
 # CANCEL BOOKING
 # =========================================================
@@ -444,29 +473,14 @@ class ActionCancelBooking(Action):
         self,
         dispatcher: CollectingDispatcher,
         tracker: Tracker,
-        domain: Dict[Text, Any],
+        domain: DomainDict,
     ) -> List[Dict[Text, Any]]:
 
-        has_booking = any(
-            tracker.get_slot(slot)
-            for slot in [
-                "name",
-                "checkin",
-                "checkout",
-                "guests",
-                "room_type",
-            ]
-        )
-
-        if not has_booking:
-            dispatcher.utter_message(
-                text="You don’t have an active booking to cancel."
-            )
+        if not tracker.get_slot("booking_ready"):
+            dispatcher.utter_message(template="utter_no_active_booking")
             return []
 
-        dispatcher.utter_message(
-            text="Your booking has been cancelled. All details were cleared. Could I help you with anything else today?"
-        )
+        dispatcher.utter_message(template="utter_booking_cancelled")
 
         return [
             SlotSet("name", None),
@@ -477,4 +491,5 @@ class ActionCancelBooking(Action):
             SlotSet("breakfast", None),
             SlotSet("payment", None),
             SlotSet("refund", None),
+            SlotSet("booking_ready", None),
         ]

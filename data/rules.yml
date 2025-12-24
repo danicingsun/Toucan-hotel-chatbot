@@ -2,12 +2,14 @@ version: "3.1"
 
 rules:
 
+# Start booking
 - rule: Activate booking form
   steps:
     - intent: book_hotel
     - action: booking_form
     - active_loop: booking_form
 
+# Submit booking form (always runs — guarded in action)
 - rule: Submit booking form
   condition:
     - active_loop: booking_form
@@ -16,20 +18,26 @@ rules:
     - active_loop: null
     - action: action_submit_booking
 
-- rule: Confirm booking after summary
+# Confirm booking ONLY after summary
+- rule: Confirm booking
+  condition:
+    - slot_was_set:
+        - booking_ready: true
   steps:
     - intent: affirm
     - action: action_submit_booking_confirmed
 
-- rule: Deny booking after summary
+# Deny booking ONLY after summary
+- rule: Deny booking
+  condition:
+    - slot_was_set:
+        - booking_ready: true
   steps:
     - intent: deny
     - action: action_cancel_booking
 
-- rule: Cancel with no active booking
-  condition:
-  - active_loop: null
+# Stop anytime
+- rule: Cancel anytime
   steps:
-  - intent: stop
-  - action: utter_no_active_booking 
-
+    - intent: stop
+    - action: action_cancel_booking

@@ -28,6 +28,7 @@ entities:
 slots:
   name:
     type: text
+    influence_conversation: false
     mappings:
       - type: from_text
         conditions:
@@ -36,6 +37,7 @@ slots:
 
   checkin:
     type: text
+    influence_conversation: false
     mappings:
       - type: from_text
         conditions:
@@ -49,6 +51,7 @@ slots:
 
   checkout:
     type: text
+    influence_conversation: false
     mappings:
       - type: from_text
         conditions:
@@ -62,6 +65,7 @@ slots:
 
   guests:
     type: text
+    influence_conversation: false
     mappings:
       - type: from_text
         conditions:
@@ -75,6 +79,7 @@ slots:
 
   room_type:
     type: text
+    influence_conversation: false
     mappings:
       - type: from_text
         conditions:
@@ -88,6 +93,7 @@ slots:
 
   breakfast:
     type: text
+    influence_conversation: false
     mappings:
       - type: from_text
         conditions:
@@ -98,9 +104,10 @@ slots:
         conditions:
           - active_loop: booking_form
             requested_slot: breakfast
-  
+
   payment:
     type: text
+    influence_conversation: false
     mappings:
       - type: from_text
         conditions:
@@ -114,6 +121,7 @@ slots:
 
   refund:
     type: text
+    influence_conversation: false
     mappings:
       - type: from_text
         conditions:
@@ -125,6 +133,12 @@ slots:
           - active_loop: booking_form
             requested_slot: refund
 
+  # CONTROL SLOT FOR TWO-STEP CONFIRMATION
+  booking_ready:
+    type: bool
+    influence_conversation: true
+    mappings:
+      - type: custom
 
 forms:
   booking_form:
@@ -172,7 +186,7 @@ responses:
           payload: "credit card"
         - title: "Cash"
           payload: "cash"
-  
+
   utter_ask_refund:
     - text: "Do you prefer a refundable or non-refundable rate?"
       buttons:
@@ -193,7 +207,7 @@ responses:
         • Payment: {payment}
         • Refund policy: {refund}
 
-        Would you like to confirm the booking? Please answer with confirm or deny.
+        Would you like to confirm the booking?
       buttons:
         - title: "✅ Confirm"
           payload: "/affirm"
@@ -202,6 +216,9 @@ responses:
 
   utter_no_active_booking:
     - text: "You don’t have an active booking to cancel."
+
+  utter_booking_cancelled:
+    - text: "Your booking has been cancelled. All details were cleared."
 
 actions:
   - validate_booking_form
