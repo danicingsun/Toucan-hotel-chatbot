@@ -9,7 +9,8 @@ rules:
     - action: booking_form
     - active_loop: booking_form
 
-# Submit booking form (always runs — guarded in action)
+
+# Submit booking form
 - rule: Submit booking form
   condition:
     - active_loop: booking_form
@@ -17,6 +18,7 @@ rules:
     - action: booking_form
     - active_loop: null
     - action: action_submit_booking
+
 
 # Confirm booking ONLY after summary
 - rule: Confirm booking
@@ -27,7 +29,8 @@ rules:
     - intent: affirm
     - action: action_submit_booking_confirmed
 
-# Deny booking ONLY after summary
+
+# Deny booking AFTER summary
 - rule: Deny booking
   condition:
     - slot_was_set:
@@ -35,9 +38,14 @@ rules:
   steps:
     - intent: deny
     - action: action_cancel_booking
+    - active_loop: null
 
-# Stop anytime
-- rule: Cancel anytime
+
+# Cancel booking DURING form
+- rule: Cancel booking while form active
+  condition:
+    - active_loop: booking_form
   steps:
     - intent: stop
     - action: action_cancel_booking
+    - active_loop: null
