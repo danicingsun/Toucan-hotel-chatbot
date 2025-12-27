@@ -1,12 +1,11 @@
 from typing import Any, Text, Dict, List, Optional
+from datetime import datetime
 
 from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.forms import FormValidationAction
 from rasa_sdk.events import SlotSet
 from rasa_sdk.types import DomainDict
-
-from datetime import datetime
 
 
 # =========================================================
@@ -31,6 +30,40 @@ def normalize_text(value: Optional[Text]) -> Optional[Text]:
     return value.strip().lower() if value else None
 
 
+def interrupt_if_cancelled(
+    dispatcher: CollectingDispatcher,
+    tracker: Tracker,
+) -> Optional[Dict[Text, Any]]:
+    """Cancel booking if user says stop or deny."""
+    intent = tracker.latest_message.get("intent", {}).get("name")
+
+    if intent in {"stop", "deny"}:
+        dispatcher.utter_message(
+            text="Okay, I’ve cancelled the booking. If you want to start again, just let me know."
+        )
+        return {
+            "requested_slot": None,
+            "active_loop": None,
+            "booking_ready": None,
+            "name": None,
+            "checkin": None,
+            "checkout": None,
+            "guests": None,
+            "room_type": None,
+            "breakfast": None,
+            "payment": None,
+            "refund": None,
+        }
+
+    return None
+
+
+def unclear_value(dispatcher: CollectingDispatcher):
+    dispatcher.utter_message(
+        text="I’m not sure I understood that. Could you please repeat your answer?"
+    )
+
+
 # =========================================================
 # FORM VALIDATION
 # =========================================================
@@ -41,112 +74,114 @@ class ValidateBookingForm(FormValidationAction):
         return "validate_booking_form"
 
     # ---------- NAME ----------
-    def validate_name(
-        self,
-        value: Text,
-        dispatcher: CollectingDispatcher,
-        tracker: Tracker,
-        domain: DomainDict,
-    ) -> Dict[Text, Any]:
+    def validate_name(self, value, dispatcher, tracker, domain):
 
-        name = value.strip() if value else None
-        if name:
-            return {"name": name}
+        interrupt = interrupt_if_cancelled(dispatcher, tracker)
+        if interrupt:
+            return interrupt
 
-        dispatcher.utter_message(text="Please provide a valid name.")
-        return {"name": None}
+        if not value:
+            unclear_value(dispatcher)
+            return {"name": None}
+
+        name = value.strip()
+        dispatcher.utter_message(f"Great, I have the guest name as **{name}**.")
+        return {"name": name}
 
     # ---------- CHECK-IN ----------
-    def validate_checkin(
-        self,
-        value: Text,
-        dispatcher: CollectingDispatcher,
-        tracker: Tracker,
-        domain: DomainDict,
-    ) -> Dict[Text, Any]:
+    def validate_checkin(self, value, dispatcher, tracker, domain):
+
+        interrupt = interrupt_if_cancelled(dispatcher, tracker)
+        if interrupt:
+            return interrupt
+
+        if not value:
+            unclear_value(dispatcher)
+            return {"checkin": None}
 
         try:
-            checkin_date = datetime.strptime(value, DATE_FORMAT).date()
-            today = datetime.today().date()
-
-            if checkin_date <= today:
+            date = datetime.strptime(value, DATE_FORMAT).date()
+            if date <= datetime.today().date():
                 dispatcher.utter_message("Check-in must be a future date.")
                 return {"checkin": None}
 
+            dispatcher.utter_message(f"Check-in date set to {value}.")
             return {"checkin": value}
 
         except Exception:
-            dispatcher.utter_message(
-                "Please enter the check-in date in YYYY-MM-DD format."
-            )
+            dispatcher.utter_message("Please use YYYY-MM-DD format for the date.")
             return {"checkin": None}
 
     # ---------- CHECK-OUT ----------
-    def validate_checkout(
-        self,
-        value: Text,
-        dispatcher: CollectingDispatcher,
-        tracker: Tracker,
-        domain: DomainDict,
-    ) -> Dict[Text, Any]:
+    def validate_checkout(self, value, dispatcher, tracker, domain):
+
+        interrupt = interrupt_if_cancelled(dispatcher, tracker)
+        if interrupt:
+            return interrupt
+
+        if not value:
+            unclear_value(dispatcher)
+            return {"checkout": None}
 
         try:
-            checkout_date = datetime.strptime(value, DATE_FORMAT).date()
-            checkin_value = tracker.get_slot("checkin")
+            checkout = datetime.strptime(value, DATE_FORMAT).date()
+            checkin = tracker.get_slot("checkin")
 
-            if checkin_value:
-                checkin_date = datetime.strptime(checkin_value, DATE_FORMAT).date()
-                if checkout_date <= checkin_date:
+            if checkin:
+                checkin_date = datetime.strptime(checkin, DATE_FORMAT).date()
+                if checkout <= checkin_date:
                     dispatcher.utter_message(
                         "Check-out must be after the check-in date."
                     )
                     return {"checkout": None}
 
+            dispatcher.utter_message(f"Check-out date set to {value}.")
             return {"checkout": value}
 
         except Exception:
-            dispatcher.utter_message(
-                "Please enter the check-out date in YYYY-MM-DD format."
-            )
+            dispatcher.utter_message("Please use YYYY-MM-DD format.")
             return {"checkout": None}
 
     # ---------- GUESTS ----------
-    def validate_guests(
-        self,
-        value: Text,
-        dispatcher: CollectingDispatcher,
-        tracker: Tracker,
-        domain: DomainDict,
-    ) -> Dict[Text, Any]:
+    def validate_guests(self, value, dispatcher, tracker, domain):
+
+        interrupt = interrupt_if_cancelled(dispatcher, tracker)
+        if interrupt:
+            return interrupt
+
+        if not value:
+            unclear_value(dispatcher)
+            return {"guests": None}
 
         try:
             guests = int(value)
             if 1 <= guests <= MAX_GUESTS:
+                dispatcher.utter_message(
+                    f"Got it — booking for {guests} guest(s)."
+                )
                 return {"guests": str(guests)}
         except Exception:
             pass
 
-        dispatcher.utter_message(
-            "Please enter a valid number of guests (1–4)."
-        )
+        dispatcher.utter_message("Please enter a number between 1 and 4.")
         return {"guests": None}
 
     # ---------- ROOM TYPE ----------
-    def validate_room_type(
-        self,
-        value: Text,
-        dispatcher: CollectingDispatcher,
-        tracker: Tracker,
-        domain: DomainDict,
-    ) -> Dict[Text, Any]:
+    def validate_room_type(self, value, dispatcher, tracker, domain):
+
+        interrupt = interrupt_if_cancelled(dispatcher, tracker)
+        if interrupt:
+            return interrupt
+
+        if not value:
+            unclear_value(dispatcher)
+            return {"room_type": None}
 
         room_type = normalize_text(value)
-        guests_raw = tracker.get_slot("guests")
+        guests = tracker.get_slot("guests")
 
-        try:
-            guests = int(guests_raw)
-        except Exception:
-            dispatcher.utter_message("Let's confirm the number of guests first.")
+        if not guests:
+            dispatcher.utter_message("Let’s confirm the number of guests first.")
             return {"room_type": None, "requested_slot": "guests"}
 
         if room_type not in ROOM_CAPACITY:
@@ -155,66 +190,78 @@ class ValidateBookingForm(FormValidationAction):
             )
             return {"room_type": None}
 
-        if guests > ROOM_CAPACITY[room_type]:
+        if int(guests) > ROOM_CAPACITY[room_type]:
             dispatcher.utter_message(
                 f"A {room_type} room can host up to {ROOM_CAPACITY[room_type]} guest(s)."
             )
             return {"room_type": None}
 
+        dispatcher.utter_message(f"{room_type.capitalize()} room selected.")
         return {"room_type": room_type}
 
     # ---------- BREAKFAST ----------
-    def validate_breakfast(
-        self,
-        value: Text,
-        dispatcher: CollectingDispatcher,
-        tracker: Tracker,
-        domain: DomainDict,
-    ) -> Dict[Text, Any]:
+    def validate_breakfast(self, value, dispatcher, tracker, domain):
+
+        interrupt = interrupt_if_cancelled(dispatcher, tracker)
+        if interrupt:
+            return interrupt
+
+        if not value:
+            unclear_value(dispatcher)
+            return {"breakfast": None}
 
         norm = normalize_text(value)
 
         if norm in YES_VALUES:
+            dispatcher.utter_message("Breakfast will be included.")
             return {"breakfast": "yes"}
 
         if norm in NO_VALUES:
+            dispatcher.utter_message("No breakfast will be included.")
             return {"breakfast": "no"}
 
         dispatcher.utter_message("Please answer yes or no.")
         return {"breakfast": None}
 
     # ---------- PAYMENT ----------
-    def validate_payment(
-        self,
-        value: Text,
-        dispatcher: CollectingDispatcher,
-        tracker: Tracker,
-        domain: DomainDict,
-    ) -> Dict[Text, Any]:
+    def validate_payment(self, value, dispatcher, tracker, domain):
+
+        interrupt = interrupt_if_cancelled(dispatcher, tracker)
+        if interrupt:
+            return interrupt
+
+        if not value:
+            unclear_value(dispatcher)
+            return {"payment": None}
 
         norm = normalize_text(value)
 
         if "credit" in norm:
+            dispatcher.utter_message("Payment method set to credit card.")
             return {"payment": "credit card"}
 
         if "cash" in norm:
+            dispatcher.utter_message("Payment method set to cash.")
             return {"payment": "cash"}
 
-        dispatcher.utter_message("Payment options are credit card or cash.")
+        dispatcher.utter_message("Please choose credit card or cash.")
         return {"payment": None}
 
     # ---------- REFUND ----------
-    def validate_refund(
-        self,
-        value: Text,
-        dispatcher: CollectingDispatcher,
-        tracker: Tracker,
-        domain: DomainDict,
-    ) -> Dict[Text, Any]:
+    def validate_refund(self, value, dispatcher, tracker, domain):
+
+        interrupt = interrupt_if_cancelled(dispatcher, tracker)
+        if interrupt:
+            return interrupt
+
+        if not value:
+            unclear_value(dispatcher)
+            return {"refund": None}
 
         norm = normalize_text(value)
 
         if norm in {"refundable", "non-refundable", "nonrefundable"}:
+            dispatcher.utter_message(f"Refund policy set to {norm}.")
             return {"refund": norm}
 
         dispatcher.utter_message("Please choose refundable or non-refundable.")
@@ -222,7 +269,7 @@ class ValidateBookingForm(FormValidationAction):
 
 
 # =========================================================
-# SUBMIT BOOKING (SHOW SUMMARY)
+# SUBMIT BOOKING
 # =========================================================
 
 class ActionSubmitBooking(Action):
@@ -230,16 +277,11 @@ class ActionSubmitBooking(Action):
     def name(self) -> Text:
         return "action_submit_booking"
 
-    def run(
-        self,
-        dispatcher: CollectingDispatcher,
-        tracker: Tracker,
-        domain: DomainDict,
-    ) -> List[Dict[Text, Any]]:
+    def run(self, dispatcher, tracker, domain):
 
-        required_slots = domain["forms"]["booking_form"]["required_slots"]
+        required = domain["forms"]["booking_form"]["required_slots"]
 
-        if any(tracker.get_slot(slot) is None for slot in required_slots):
+        if any(tracker.get_slot(s) is None for s in required):
             return []
 
         dispatcher.utter_message(template="utter_summary")
@@ -256,12 +298,7 @@ class ActionSubmitBookingConfirmed(Action):
     def name(self) -> Text:
         return "action_submit_booking_confirmed"
 
-    def run(
-        self,
-        dispatcher: CollectingDispatcher,
-        tracker: Tracker,
-        domain: DomainDict,
-    ) -> List[Dict[Text, Any]]:
+    def run(self, dispatcher, tracker, domain):
 
         if not tracker.get_slot("booking_ready"):
             dispatcher.utter_message("There is no booking to confirm.")
@@ -270,15 +307,13 @@ class ActionSubmitBookingConfirmed(Action):
         name = tracker.get_slot("name")
 
         dispatcher.utter_message(
-            text=(
-                f"Thank you {name}, your booking has been confirmed! 🎉 "
-                "We look forward to welcoming you."
-            )
-            if name
-            else "Your booking has been confirmed! 🎉"
+            f"✅ Thank you {name}, your booking is confirmed!"
+            if name else
+            "✅ Your booking is confirmed!"
         )
 
         return [
+            SlotSet("booking_ready", None),
             SlotSet("name", None),
             SlotSet("checkin", None),
             SlotSet("checkout", None),
@@ -287,7 +322,6 @@ class ActionSubmitBookingConfirmed(Action):
             SlotSet("breakfast", None),
             SlotSet("payment", None),
             SlotSet("refund", None),
-            SlotSet("booking_ready", None),
         ]
 
 
@@ -300,16 +334,12 @@ class ActionCancelBooking(Action):
     def name(self) -> Text:
         return "action_cancel_booking"
 
-    def run(
-        self,
-        dispatcher: CollectingDispatcher,
-        tracker: Tracker,
-        domain: DomainDict,
-    ) -> List[Dict[Text, Any]]:
+    def run(self, dispatcher, tracker, domain):
 
-        dispatcher.utter_message(template="utter_booking_cancelled")
+        dispatcher.utter_message("Your booking has been cancelled.")
 
         return [
+            SlotSet("booking_ready", None),
             SlotSet("name", None),
             SlotSet("checkin", None),
             SlotSet("checkout", None),
@@ -318,5 +348,4 @@ class ActionCancelBooking(Action):
             SlotSet("breakfast", None),
             SlotSet("payment", None),
             SlotSet("refund", None),
-            SlotSet("booking_ready", None),
         ]
