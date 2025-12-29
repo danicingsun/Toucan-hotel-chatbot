@@ -1,19 +1,21 @@
-version: "3.1"
+version: "3.4"
 
 rules:
 
-# Start booking
+# --------------------------------------------------
+# Start booking (ONLY if not already active)
+# --------------------------------------------------
 - rule: Activate booking form
-  condition:
-    - slot_was_set:
-        - booking_active: false
   steps:
     - intent: book_hotel
+    - action: action_start_booking
     - action: booking_form
     - active_loop: booking_form
 
 
-# Submit booking form
+# --------------------------------------------------
+# Submit form → show summary
+# --------------------------------------------------
 - rule: Submit booking form
   condition:
     - active_loop: booking_form
@@ -23,7 +25,9 @@ rules:
     - action: action_submit_booking
 
 
-# Confirm booking ONLY after summary
+# --------------------------------------------------
+# Confirm booking after summary
+# --------------------------------------------------
 - rule: Confirm booking
   condition:
     - slot_was_set:
@@ -33,7 +37,9 @@ rules:
     - action: action_submit_booking_confirmed
 
 
-# Deny booking AFTER summary
+# --------------------------------------------------
+# Deny booking after summary
+# --------------------------------------------------
 - rule: Deny booking
   condition:
     - slot_was_set:
@@ -41,11 +47,12 @@ rules:
   steps:
     - intent: deny
     - action: action_cancel_booking
-    - active_loop: null
 
 
-# Cancel booking DURING form
-- rule: Cancel booking while form active
+# --------------------------------------------------
+# Cancel while filling the form
+# --------------------------------------------------
+- rule: Cancel booking during form
   condition:
     - active_loop: booking_form
   steps:

@@ -63,6 +63,20 @@ def unclear_value(dispatcher: CollectingDispatcher):
         text="I’m not sure I understood that. Could you please repeat your answer?"
     )
 
+# =========================================================
+# Sgtart booking by setting the initial values for required slots
+# =========================================================
+
+class ActionStartBooking(Action):
+    def name(self) -> Text:
+        return "action_start_booking"
+
+    def run(self, dispatcher, tracker, domain):
+        return [
+            SlotSet("booking_active", True),
+            SlotSet("booking_ready", None),
+        ]
+
 
 # =========================================================
 # FORM VALIDATION
