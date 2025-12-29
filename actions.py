@@ -75,6 +75,7 @@ class ActionStartBooking(Action):
         return [
             SlotSet("booking_active", True),
             SlotSet("booking_ready", None),
+            SlotSet("requested_slot", "name"),
         ]
 
 
@@ -302,7 +303,7 @@ class ActionSubmitBooking(Action):
 
         return [
             SlotSet("booking_ready", True),
-            SlotSet("booking_active", True),
+            SlotSet("booking_active", False),
         ]
 
 
