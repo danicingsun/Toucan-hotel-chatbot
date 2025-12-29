@@ -85,7 +85,7 @@ class ValidateBookingForm(FormValidationAction):
             return {"name": None}
 
         name = value.strip()
-        dispatcher.utter_message(f"Great, I have the guest name as **{name}**.")
+        dispatcher.utter_message(f"Great, I have the main guest name as {name}.")
         return {"name": name}
 
     # ---------- CHECK-IN ----------
@@ -102,10 +102,10 @@ class ValidateBookingForm(FormValidationAction):
         try:
             date = datetime.strptime(value, DATE_FORMAT).date()
             if date <= datetime.today().date():
-                dispatcher.utter_message("Check-in must be a future date.")
+                dispatcher.utter_message("Checkin must be a future date.")
                 return {"checkin": None}
 
-            dispatcher.utter_message(f"Check-in date set to {value}.")
+            dispatcher.utter_message(f"Checkin date set to {value}.")
             return {"checkin": value}
 
         except Exception:
@@ -131,7 +131,7 @@ class ValidateBookingForm(FormValidationAction):
                 checkin_date = datetime.strptime(checkin, DATE_FORMAT).date()
                 if checkout <= checkin_date:
                     dispatcher.utter_message(
-                        "Check-out must be after the check-in date."
+                        "Checkout must be after the checkin date."
                     )
                     return {"checkout": None}
 
@@ -237,11 +237,11 @@ class ValidateBookingForm(FormValidationAction):
         norm = normalize_text(value)
 
         if "credit" in norm:
-            dispatcher.utter_message("Payment method set to credit card.")
+            dispatcher.utter_message("Payment method is set to credit card.")
             return {"payment": "credit card"}
 
         if "cash" in norm:
-            dispatcher.utter_message("Payment method set to cash.")
+            dispatcher.utter_message("Payment method is set to cash.")
             return {"payment": "cash"}
 
         dispatcher.utter_message("Please choose credit card or cash.")
@@ -286,7 +286,10 @@ class ActionSubmitBooking(Action):
 
         dispatcher.utter_message(template="utter_summary")
 
-        return [SlotSet("booking_ready", True)]
+        return [
+            SlotSet("booking_ready", True)
+            SlotSet("booking_active", True),
+        ]
 
 
 # =========================================================
@@ -314,6 +317,7 @@ class ActionSubmitBookingConfirmed(Action):
 
         return [
             SlotSet("booking_ready", None),
+            SlotSet("booking_active", None),
             SlotSet("name", None),
             SlotSet("checkin", None),
             SlotSet("checkout", None),
@@ -340,6 +344,7 @@ class ActionCancelBooking(Action):
 
         return [
             SlotSet("booking_ready", None),
+            SlotSet("booking_active", None),
             SlotSet("name", None),
             SlotSet("checkin", None),
             SlotSet("checkout", None),

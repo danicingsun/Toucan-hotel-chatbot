@@ -133,8 +133,15 @@ slots:
           - active_loop: booking_form
             requested_slot: refund
 
-  # CONTROL SLOT FOR TWO-STEP CONFIRMATION
+  # Control slot for two step confirmation
   booking_ready:
+    type: bool
+    influence_conversation: true
+    mappings:
+      - type: custom
+
+  # Slot for tracking if booking is already active
+  booking_active:
     type: bool
     influence_conversation: true
     mappings:

@@ -4,6 +4,9 @@ rules:
 
 # Start booking
 - rule: Activate booking form
+  condition:
+    - slot_was_set:
+        - booking_active: false
   steps:
     - intent: book_hotel
     - action: booking_form
