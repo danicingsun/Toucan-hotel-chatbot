@@ -287,7 +287,7 @@ class ActionSubmitBooking(Action):
         dispatcher.utter_message(template="utter_summary")
 
         return [
-            SlotSet("booking_ready", True)
+            SlotSet("booking_ready", True),
             SlotSet("booking_active", True),
         ]
 
