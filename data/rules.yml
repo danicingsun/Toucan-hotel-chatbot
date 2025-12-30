@@ -24,7 +24,6 @@ rules:
     - intent: stop
     - action: action_cancel_booking
     - active_loop: null
-    - action: action_clear_booking_slots
 
 # --------------------------------------------------
 # Submit form → show summary
@@ -60,13 +59,3 @@ rules:
     - action: action_clear_booking_slots
     - action: action_cancel_booking
     - active_loop: null
-
-# --------------------------------------------------
-# Restart booking after cancel
-# --------------------------------------------------
-- rule: Restart booking after cancel
-  steps:
-    - intent: book_hotel
-    - action: action_clear_booking_slots
-    - action: booking_form
-    - active_loop: booking_form

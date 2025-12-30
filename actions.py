@@ -181,18 +181,19 @@ class ActionSubmitBookingConfirmed(Action):
             if name else "✅ Your booking is confirmed!"
         )
 
-        return {
-            "booking_ready": None,
-            "name": None,
-            "checkin": None,
-            "checkout": None,
-            "guests": None,
-            "room_type": None,
-            "breakfast": None,
-            "payment": None,
-            "refund": None,
-            "requested_slot": None,
-        }
+        return [
+            SlotSet("booking_ready", None),
+            SlotSet("name", None),
+            SlotSet("checkin", None),
+            SlotSet("checkout", None),
+            SlotSet("guests", None),
+            SlotSet("room_type", None),
+            SlotSet("breakfast", None),
+            SlotSet("payment", None),
+            SlotSet("refund", None),
+            SlotSet("requested_slot", None),
+            ActiveLoop(None)
+        ]
 
 # ============================================================
 # CANCEL BOOKING (mid‑form or after summary)
@@ -210,8 +211,17 @@ class ActionCancelBooking(Action):
         ]
 
         return [
-            *[SlotSet(slot, None) for slot in slots_to_reset],
-            ActiveLoop(None)   # <-- REQUIRED for Rasa 3.6 cancellation
+            SlotSet("booking_ready", None),
+            SlotSet("name", None),
+            SlotSet("checkin", None),
+            SlotSet("checkout", None),
+            SlotSet("guests", None),
+            SlotSet("room_type", None),
+            SlotSet("breakfast", None),
+            SlotSet("payment", None),
+            SlotSet("refund", None),
+            SlotSet("requested_slot", None),
+            ActiveLoop(None),
         ]
 
 
@@ -224,15 +234,15 @@ class ActionClearBookingSlots(Action):
 
     def run(self, dispatcher, tracker, domain):
 
-        return {
-            "booking_ready": None,
-            "name": None,
-            "checkin": None,
-            "checkout": None,
-            "guests": None,
-            "room_type": None,
-            "breakfast": None,
-            "payment": None,
-            "refund": None,
-            "requested_slot": None,
-        }
+        return [
+            SlotSet("booking_ready", None),
+            SlotSet("name", None),
+            SlotSet("checkin", None),
+            SlotSet("checkout", None),
+            SlotSet("guests", None),
+            SlotSet("room_type", None),
+            SlotSet("breakfast", None),
+            SlotSet("payment", None),
+            SlotSet("refund", None),
+            SlotSet("requested_slot", None),
+        ]
