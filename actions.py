@@ -179,7 +179,10 @@ class ActionCancelBooking(Action):
         dispatcher.utter_message("Your booking has been cancelled. All details were cleared.")
         slots_to_reset = ["booking_ready", "booking_blocked", "name", "checkin", "checkout", "guests",
                           "room_type", "breakfast", "payment", "refund", "requested_slot"]
-        return [SlotSet(slot, None) for slot in slots_to_reset]
+        return [
+            SlotSet(slot, None) for slot in slots_to_reset
+            ActiveLoop(None)
+        ]
 
 
 # ===============================
@@ -192,4 +195,7 @@ class ActionClearBookingSlots(Action):
     def run(self, dispatcher, tracker, domain):
         slots_to_reset = ["booking_ready", "name", "checkin", "checkout", "guests",
                           "room_type", "breakfast", "payment", "refund", "requested_slot"]
-        return [SlotSet(slot, None) for slot in slots_to_reset]
+        return [
+            SlotSet(slot, None) for slot in slots_to_reset
+            ActiveLoop(None)
+        ]
