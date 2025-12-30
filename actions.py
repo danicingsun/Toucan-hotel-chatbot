@@ -34,14 +34,18 @@ class ValidateBookingForm(FormValidationAction):
         return tracker.latest_message.intent.get("name") == "stop"
 
     def validate_name(self, value, dispatcher, tracker, domain):
+        if tracker.latest_message.intent.get("name") == "stop": 
+            return {"requested_slot": None}
         # Reject values that are clearly not names 
-        if not value or len(value.split()) > 4 or any(word in value.lower() for word in ["book", "room", "start", "please"]): 
+        if not value or len(value.split()) > 4 or any(word in value.lower() for word in ["book", "start", "cancel", "stop", "booking", "deny", "room", "please"]): 
             unclear_value(dispatcher) 
             return {"name": None} 
         dispatcher.utter_message(f"Great, I have the main guest name as {value.strip()}.") 
         return {"name": value.strip()}
         
     def validate_checkin(self, value, dispatcher, tracker, domain):
+        if tracker.latest_message.intent.get("name") == "stop": 
+            return {"requested_slot": None}
         if not value:
             unclear_value(dispatcher)
             return {"checkin": None}
@@ -57,6 +61,8 @@ class ValidateBookingForm(FormValidationAction):
             return {"checkin": None}
 
     def validate_checkout(self, value, dispatcher, tracker, domain):
+        if tracker.latest_message.intent.get("name") == "stop": 
+            return {"requested_slot": None}
         if not value:
             unclear_value(dispatcher)
             return {"checkout": None}
@@ -75,6 +81,8 @@ class ValidateBookingForm(FormValidationAction):
             return {"checkout": None}
 
     def validate_guests(self, value, dispatcher, tracker, domain):
+        if tracker.latest_message.intent.get("name") == "stop": 
+            return {"requested_slot": None}
         if not value:
             unclear_value(dispatcher)
             return {"guests": None}
@@ -89,6 +97,8 @@ class ValidateBookingForm(FormValidationAction):
         return {"guests": None}
 
     def validate_room_type(self, value, dispatcher, tracker, domain):
+        if tracker.latest_message.intent.get("name") == "stop": 
+            return {"requested_slot": None}
         if not value:
             unclear_value(dispatcher)
             return {"room_type": None}
@@ -114,6 +124,8 @@ class ValidateBookingForm(FormValidationAction):
         return {"room_type": room_type}
 
     def validate_breakfast(self, value, dispatcher, tracker, domain):
+        if tracker.latest_message.intent.get("name") == "stop": 
+            return {"requested_slot": None}
         if not value:
             unclear_value(dispatcher)
             return {"breakfast": None}
@@ -130,6 +142,8 @@ class ValidateBookingForm(FormValidationAction):
         return {"breakfast": None}
 
     def validate_payment(self, value, dispatcher, tracker, domain):
+        if tracker.latest_message.intent.get("name") == "stop": 
+            return {"requested_slot": None}
         if not value:
             unclear_value(dispatcher)
             return {"payment": None}
@@ -146,6 +160,8 @@ class ValidateBookingForm(FormValidationAction):
         return {"payment": None}
 
     def validate_refund(self, value, dispatcher, tracker, domain):
+        if tracker.latest_message.intent.get("name") == "stop": 
+            return {"requested_slot": None}
         if not value:
             unclear_value(dispatcher)
             return {"refund": None}
