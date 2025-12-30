@@ -224,7 +224,7 @@ responses:
   utter_no_active_booking:
     - text: "You don’t have an active booking to cancel."
 
-  utter_booking_cancelled:
+  utter_cancel_booking:
     - text: "Your booking has been cancelled. All details were cleared."
 
 actions:

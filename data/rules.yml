@@ -1,4 +1,4 @@
-version: "3.6"
+version: "3.1"
 
 rules:
 
@@ -6,9 +6,11 @@ rules:
 # Start booking (ONLY if not already active)
 # --------------------------------------------------
 - rule: Activate booking form
+  condition:
+    - active_loop: null
   steps:
     - intent: book_hotel
-    - action: action_start_booking
+    - action: booking_form
     - active_loop: booking_form
 
 
@@ -51,10 +53,11 @@ rules:
 # --------------------------------------------------
 # Cancel while filling the form
 # --------------------------------------------------
-- rule: Cancel booking during form
+- rule: Cancel booking while form is active
   condition:
     - active_loop: booking_form
   steps:
     - intent: stop
-    - action: action_cancel_booking
+    - action: action_deactivate_loop
     - active_loop: null
+    - action: utter_cancel_booking
