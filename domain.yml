@@ -140,10 +140,11 @@ slots:
     mappings:
       - type: custom
 
-  # COntrol slot for blocking the booking
+  # Block form restart after cancellation
   booking_blocked:
     type: bool
     influence_conversation: true
+    initial_value: false
     mappings:
       - type: custom
 
@@ -232,4 +233,4 @@ actions:
   - action_submit_booking
   - action_submit_booking_confirmed
   - action_cancel_booking
-  - action_clear_booking_block
+  - action_clear_booking_slots
