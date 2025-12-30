@@ -1,5 +1,8 @@
 version: "3.1"
 
-stories: []
-
-
+stories:
+- story: booking happy path
+  steps:
+    - intent: book_hotel
+    - action: booking_form
+    - active_loop: booking_form

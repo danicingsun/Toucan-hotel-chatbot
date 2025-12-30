@@ -1,4 +1,4 @@
-version: "3.4"
+version: "3.6"
 
 rules:
 
@@ -9,7 +9,6 @@ rules:
   steps:
     - intent: book_hotel
     - action: action_start_booking
-    - action: booking_form
     - active_loop: booking_form
 
 

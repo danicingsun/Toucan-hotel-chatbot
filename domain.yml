@@ -229,6 +229,7 @@ responses:
 
 actions:
   - validate_booking_form
+  - action_start_booking
   - action_submit_booking
   - action_submit_booking_confirmed
   - action_cancel_booking

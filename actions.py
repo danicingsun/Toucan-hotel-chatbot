@@ -42,7 +42,6 @@ def interrupt_if_cancelled(
             text="Okay, I’ve cancelled the booking. If you want to start again, just let me know."
         )
         return {
-            "requested_slot": None,
             "active_loop": None,
             "booking_ready": None,
             "name": None,
@@ -75,7 +74,6 @@ class ActionStartBooking(Action):
         return [
             SlotSet("booking_active", True),
             SlotSet("booking_ready", None),
-            SlotSet("requested_slot", "name"),
         ]
 
 
@@ -304,6 +302,7 @@ class ActionSubmitBooking(Action):
         return [
             SlotSet("booking_ready", True),
             SlotSet("booking_active", False),
+            SlotSet("requested_slot", None),
         ]
 
 
