@@ -5,14 +5,25 @@ rules:
 # --------------------------------------------------
 # Start booking (ONLY if not already active)
 # --------------------------------------------------
-- rule: Activate booking form
+- rule: Start booking
   condition:
     - active_loop: null
+    - slot_was_set:
+        - booking_blocked: false
   steps:
     - intent: book_hotel
     - action: booking_form
     - active_loop: booking_form
 
+# --------------------------------------------------
+# Restart booking after being blocked (explicit user intent)
+# --------------------------------------------------
+- rule: Restart blocked booking
+  steps:
+    - intent: book_hotel
+    - action: action_clear_booking_block
+    - action: booking_form
+    - active_loop: booking_form
 
 # --------------------------------------------------
 # Submit form → show summary
