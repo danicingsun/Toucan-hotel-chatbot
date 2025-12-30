@@ -197,13 +197,19 @@ class ActionSubmitBookingConfirmed(Action):
             if name else "✅ Your booking is confirmed!"
         )
 
-        slots_to_reset = [
-            "booking_ready", "booking_blocked", "name", "checkin", "checkout",
-            "guests", "room_type", "breakfast", "payment", "refund", "requested_slot"
-        ]
-
-        return [SlotSet(slot, None) for slot in slots_to_reset]
-
+        return {
+            "booking_blocked": False,
+            "booking_ready": None,
+            "name": None,
+            "checkin": None,
+            "checkout": None,
+            "guests": None,
+            "room_type": None,
+            "breakfast": None,
+            "payment": None,
+            "refund": None,
+            "requested_slot": None,
+        }
 
 # ============================================================
 # CANCEL BOOKING (mid‑form or after summary)
@@ -234,9 +240,17 @@ class ActionClearBookingSlots(Action):
         return "action_clear_booking_slots"
 
     def run(self, dispatcher, tracker, domain):
-        slots_to_reset = [
-            "booking_ready", "name", "checkin", "checkout", "guests",
-            "room_type", "breakfast", "payment", "refund", "requested_slot"
-        ]
 
-        return [SlotSet(slot, None) for slot in slots_to_reset]
+        return {
+            "booking_blocked": False,
+            "booking_ready": None,
+            "name": None,
+            "checkin": None,
+            "checkout": None,
+            "guests": None,
+            "room_type": None,
+            "breakfast": None,
+            "payment": None,
+            "refund": None,
+            "requested_slot": None,
+        }

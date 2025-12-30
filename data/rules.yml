@@ -80,3 +80,5 @@ rules:
         - booking_blocked: false
     - action: booking_form
     - active_loop: booking_form
+    - slot_was_set:
+        - booking_blocked: false
