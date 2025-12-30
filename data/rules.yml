@@ -8,8 +8,6 @@ rules:
 - rule: Start booking
   condition:
     - active_loop: null
-    - slot_was_set:
-        - booking_blocked: false
   steps:
     - intent: book_hotel
     - action: action_clear_booking_slots
@@ -27,8 +25,6 @@ rules:
     - action: action_cancel_booking
     - active_loop: null
     - action: action_clear_booking_slots
-    - slot_was_set:
-        - booking_blocked: true
 
 # --------------------------------------------------
 # Submit form → show summary
@@ -51,8 +47,6 @@ rules:
   steps:
     - intent: affirm
     - action: action_submit_booking_confirmed
-    - slot_was_set:
-        - booking_blocked: false
 
 # --------------------------------------------------
 # Deny booking after summary
@@ -66,8 +60,6 @@ rules:
     - action: action_clear_booking_slots
     - action: action_cancel_booking
     - active_loop: null
-    - slot_was_set:
-        - booking_blocked: true
 
 # --------------------------------------------------
 # Restart booking after cancel
@@ -76,9 +68,5 @@ rules:
   steps:
     - intent: book_hotel
     - action: action_clear_booking_slots
-    - slot_was_set:
-        - booking_blocked: false
     - action: booking_form
     - active_loop: booking_form
-    - slot_was_set:
-        - booking_blocked: false
