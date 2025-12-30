@@ -263,7 +263,7 @@ class ActionCancelBooking(Action):
 
         return [
             SlotSet("booking_ready", None),
-            SlotSet("booking_blocked", None),
+            SlotSet("booking_blocked", True),
             SlotSet("name", None),
             SlotSet("checkin", None),
             SlotSet("checkout", None),
