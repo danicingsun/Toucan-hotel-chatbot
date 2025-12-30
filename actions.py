@@ -1,9 +1,9 @@
-from typing import Any, Text, Dict, Optional
+from typing import Text, Optional
 from datetime import datetime
 from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.forms import FormValidationAction
-from rasa_sdk.events import SlotSet
+from rasa_sdk.events import SlotSet, ActiveLoop
 
 DATE_FORMAT = "%Y-%m-%d"
 MAX_GUESTS = 4
@@ -22,14 +22,20 @@ def unclear_value(dispatcher: CollectingDispatcher):
     )
 
 
-# ===============================
+# ============================================================
 # FORM VALIDATION
-# ===============================
+# ============================================================
 class ValidateBookingForm(FormValidationAction):
     def name(self) -> Text:
         return "validate_booking_form"
 
+    # Optional: allow cancellation during validation
+    def _is_cancel(self, tracker):
+        return tracker.latest_message.intent.get("name") == "stop"
+
     def validate_name(self, value, dispatcher, tracker, domain):
+        if self._is_cancel(tracker):
+            return {"requested_slot": None}
         if not value:
             unclear_value(dispatcher)
             return {"name": None}
@@ -37,6 +43,8 @@ class ValidateBookingForm(FormValidationAction):
         return {"name": value.strip()}
 
     def validate_checkin(self, value, dispatcher, tracker, domain):
+        if self._is_cancel(tracker):
+            return {"requested_slot": None}
         if not value:
             unclear_value(dispatcher)
             return {"checkin": None}
@@ -52,6 +60,8 @@ class ValidateBookingForm(FormValidationAction):
             return {"checkin": None}
 
     def validate_checkout(self, value, dispatcher, tracker, domain):
+        if self._is_cancel(tracker):
+            return {"requested_slot": None}
         if not value:
             unclear_value(dispatcher)
             return {"checkout": None}
@@ -70,6 +80,8 @@ class ValidateBookingForm(FormValidationAction):
             return {"checkout": None}
 
     def validate_guests(self, value, dispatcher, tracker, domain):
+        if self._is_cancel(tracker):
+            return {"requested_slot": None}
         if not value:
             unclear_value(dispatcher)
             return {"guests": None}
@@ -84,27 +96,39 @@ class ValidateBookingForm(FormValidationAction):
         return {"guests": None}
 
     def validate_room_type(self, value, dispatcher, tracker, domain):
+        if self._is_cancel(tracker):
+            return {"requested_slot": None}
         if not value:
             unclear_value(dispatcher)
             return {"room_type": None}
+
         room_type = normalize_text(value)
         guests = tracker.get_slot("guests")
+
         if not guests:
             dispatcher.utter_message("Let’s confirm the number of guests first.")
             return {"room_type": None, "requested_slot": "guests"}
+
         if room_type not in ROOM_CAPACITY:
             dispatcher.utter_message("Available room types: single, double, triple, suite.")
             return {"room_type": None}
+
         if int(guests) > ROOM_CAPACITY[room_type]:
-            dispatcher.utter_message(f"A {room_type} room can host up to {ROOM_CAPACITY[room_type]} guest(s).")
+            dispatcher.utter_message(
+                f"A {room_type} room can host up to {ROOM_CAPACITY[room_type]} guest(s)."
+            )
             return {"room_type": None}
+
         dispatcher.utter_message(f"{room_type.capitalize()} room selected.")
         return {"room_type": room_type}
 
     def validate_breakfast(self, value, dispatcher, tracker, domain):
+        if self._is_cancel(tracker):
+            return {"requested_slot": None}
         if not value:
             unclear_value(dispatcher)
             return {"breakfast": None}
+
         norm = normalize_text(value)
         if norm in YES_VALUES:
             dispatcher.utter_message("Breakfast will be included.")
@@ -112,13 +136,17 @@ class ValidateBookingForm(FormValidationAction):
         if norm in NO_VALUES:
             dispatcher.utter_message("No breakfast will be included.")
             return {"breakfast": "no"}
+
         dispatcher.utter_message("Please answer yes or no.")
         return {"breakfast": None}
 
     def validate_payment(self, value, dispatcher, tracker, domain):
+        if self._is_cancel(tracker):
+            return {"requested_slot": None}
         if not value:
             unclear_value(dispatcher)
             return {"payment": None}
+
         norm = normalize_text(value)
         if "credit" in norm:
             dispatcher.utter_message("Payment method set to credit card.")
@@ -126,24 +154,29 @@ class ValidateBookingForm(FormValidationAction):
         if "cash" in norm:
             dispatcher.utter_message("Payment method set to cash.")
             return {"payment": "cash"}
+
         dispatcher.utter_message("Please choose credit card or cash.")
         return {"payment": None}
 
     def validate_refund(self, value, dispatcher, tracker, domain):
+        if self._is_cancel(tracker):
+            return {"requested_slot": None}
         if not value:
             unclear_value(dispatcher)
             return {"refund": None}
+
         norm = normalize_text(value)
         if norm in {"refundable", "non-refundable", "nonrefundable"}:
             dispatcher.utter_message(f"Refund policy set to {norm}.")
             return {"refund": norm}
+
         dispatcher.utter_message("Please choose refundable or non-refundable.")
         return {"refund": None}
 
 
-# ===============================
-# FORM SUBMISSION / CONFIRMATION
-# ===============================
+# ============================================================
+# FORM SUBMISSION
+# ============================================================
 class ActionSubmitBooking(Action):
     def name(self) -> Text:
         return "action_submit_booking"
@@ -163,39 +196,47 @@ class ActionSubmitBookingConfirmed(Action):
             f"✅ Thank you {name}, your booking is confirmed!"
             if name else "✅ Your booking is confirmed!"
         )
-        slots_to_reset = ["booking_ready", "booking_blocked", "name", "checkin", "checkout", "guests",
-                          "room_type", "breakfast", "payment", "refund", "requested_slot"]
+
+        slots_to_reset = [
+            "booking_ready", "booking_blocked", "name", "checkin", "checkout",
+            "guests", "room_type", "breakfast", "payment", "refund", "requested_slot"
+        ]
+
         return [SlotSet(slot, None) for slot in slots_to_reset]
 
 
-# ===============================
-# CANCEL BOOKING
-# ===============================
+# ============================================================
+# CANCEL BOOKING (mid‑form or after summary)
+# ============================================================
 class ActionCancelBooking(Action):
     def name(self) -> Text:
         return "action_cancel_booking"
 
     def run(self, dispatcher, tracker, domain):
         dispatcher.utter_message("Your booking has been cancelled. All details were cleared.")
-        slots_to_reset = ["booking_ready", "booking_blocked", "name", "checkin", "checkout", "guests",
-                          "room_type", "breakfast", "payment", "refund", "requested_slot"]
+
+        slots_to_reset = [
+            "booking_ready", "name", "checkin", "checkout", "guests",
+            "room_type", "breakfast", "payment", "refund", "requested_slot"
+        ]
+
         return [
-            SlotSet(slot, None) for slot in slots_to_reset
-            ActiveLoop(None)
+            *[SlotSet(slot, None) for slot in slots_to_reset],
+            ActiveLoop(None)   # <-- REQUIRED for Rasa 3.6 cancellation
         ]
 
 
-# ===============================
-# CLEAR ALL SLOTS
-# ===============================
+# ============================================================
+# CLEAR SLOTS (used when restarting or denying)
+# ============================================================
 class ActionClearBookingSlots(Action):
     def name(self) -> Text:
         return "action_clear_booking_slots"
 
     def run(self, dispatcher, tracker, domain):
-        slots_to_reset = ["booking_ready", "name", "checkin", "checkout", "guests",
-                          "room_type", "breakfast", "payment", "refund", "requested_slot"]
-        return [
-            SlotSet(slot, None) for slot in slots_to_reset
-            ActiveLoop(None)
+        slots_to_reset = [
+            "booking_ready", "name", "checkin", "checkout", "guests",
+            "room_type", "breakfast", "payment", "refund", "requested_slot"
         ]
+
+        return [SlotSet(slot, None) for slot in slots_to_reset]

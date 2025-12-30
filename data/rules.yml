@@ -24,10 +24,9 @@ rules:
     - active_loop: booking_form
   steps:
     - intent: stop
-    - action: action_deactivate_loop
+    - action: action_cancel_booking
     - active_loop: null
     - action: action_clear_booking_slots
-    - action: action_cancel_booking
     - slot_was_set:
         - booking_blocked: true
 
@@ -66,6 +65,7 @@ rules:
     - intent: deny
     - action: action_clear_booking_slots
     - action: action_cancel_booking
+    - active_loop: null
     - slot_was_set:
         - booking_blocked: true
 
