@@ -34,12 +34,13 @@ class ValidateBookingForm(FormValidationAction):
         return tracker.latest_message.intent.get("name") == "stop"
 
     def validate_name(self, value, dispatcher, tracker, domain):
-        if not value:
-            unclear_value(dispatcher)
-            return {"name": None}
-        dispatcher.utter_message(f"Great, I have the main guest name as {value.strip()}.")
+        # Reject values that are clearly not names 
+        if not value or len(value.split()) > 4 or any(word in value.lower() for word in ["book", "room", "start", "please"]): 
+            unclear_value(dispatcher) 
+            return {"name": None} 
+        dispatcher.utter_message(f"Great, I have the main guest name as {value.strip()}.") 
         return {"name": value.strip()}
-
+        
     def validate_checkin(self, value, dispatcher, tracker, domain):
         if not value:
             unclear_value(dispatcher)
