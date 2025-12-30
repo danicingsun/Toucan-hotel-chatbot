@@ -1,9 +1,34 @@
 import React, { useEffect, useRef, useState } from "react";
-import { sendToRasa } from "../api/rasa";
 import ChatMessage from "./ChatMessage";
 import QuickReplies from "./QuickReplies";
 
+// Create a unique sender ID per browser session 
+function getSenderId() { 
+  let id = localStorage.getItem("sender_id"); 
+  if (!id) { 
+    id = crypto.randomUUID(); 
+    localStorage.setItem("sender_id", id); 
+  } 
+  return id; 
+}
+
+async function sendToRasaWithSender(message, senderId) { 
+  const res = await fetch("/webhooks/rest/webhook", { 
+    method: "POST", 
+    headers: { "Content-Type": "application/json" }, 
+    body: JSON.stringify({ 
+      sender: senderId, 
+      message 
+    }) 
+  });  
+  return res.json(); 
+}
+
+
 export default function ChatWindow() {
+
+  const senderId = getSenderId();
+
   const [messages, setMessages] = useState([
     { from: "bot", text: " Toucan: Hello — would you like help booking a room today?" }
   ]);
@@ -23,7 +48,8 @@ export default function ChatWindow() {
     // Case 1: user typed something
     if (text) {
       appendMessage({ from: "user", text });
-      const replies = await sendToRasa(text);
+      // send the text and a senderID to distinguish between users
+      const replies = await sendToRasaWithSender(text, senderId);
       handleBotReplies(replies);
       return;
     }
@@ -32,7 +58,7 @@ export default function ChatWindow() {
     if (payload) {
       // payload is {title, payload}
       appendMessage({ from: "user", text: payload.title }); // show label
-      const replies = await sendToRasa(payload.payload);    // send payload to Rasa
+      const replies = await sendToRasaWithSender(payload.payload, senderId);    // send payload and senderID to Rasa
       handleBotReplies(replies);
       return;
     }
@@ -95,16 +121,6 @@ export default function ChatWindow() {
           title="Start booking"
         >
           Start booking
-        </button>
-        <button
-          type="button"
-          className="start-btn"
-          onClick={() =>
-            sendMessage({ payload: { title: "Canceling booking...", payload: "/deny" } })
-          }
-          title="Cancel"
-        >
-          Cancel booking
         </button>
       </form>
     </div>
