@@ -10,36 +10,28 @@ rules:
     - active_loop: null
   steps:
     - intent: book_hotel
-    - action: booking_form  # this activates the form
-
-# --------------------------------------------------
-# Submit booking when form is complete
-# --------------------------------------------------
-- rule: Submit booking
-  condition:
+    - action: booking_form
     - active_loop: booking_form
-  steps:
-    - action: action_submit_booking
-    - action: action_submit_booking_confirmed  # this ends the form
 
 # --------------------------------------------------
-# Continue booking form
+# Continue filling form
 # --------------------------------------------------
 - rule: Continue booking form
   condition:
     - active_loop: booking_form
   steps:
-    - action: booking_form  # simply resumes the form
+    - action: booking_form
 
 # --------------------------------------------------
-# Stop booking while form is active
+# Cancel booking while form is active
 # --------------------------------------------------
 - rule: Cancel booking while form is active
   condition:
     - active_loop: booking_form
   steps:
     - intent: stop
-    - action: action_cancel_booking  # clears the form
+    - action: action_cancel_booking
+    - active_loop: null
 
 # --------------------------------------------------
 # Confirm booking after summary
@@ -50,7 +42,7 @@ rules:
         - booking_ready: true
   steps:
     - intent: affirm
-    - action: action_submit_booking_confirmed  # clears loop
+    - action: action_submit_booking_confirmed
 
 # --------------------------------------------------
 # Deny booking after summary
@@ -61,4 +53,5 @@ rules:
         - booking_ready: true
   steps:
     - intent: deny
-    - action: action_cancel_booking  # clears loop
+    - action: action_cancel_booking
+    - active_loop: null

@@ -183,22 +183,20 @@ class ValidateBookingForm(FormValidationAction):
         dispatcher.utter_message("Please choose refundable or non-refundable.")
         return {"refund": None}
 
-# ============================================================
-# FORM SUBMISSION
-# ============================================================
-class ActionSubmitBooking(Action):
-    """Submit booking summary and mark booking as ready."""
-    
-    def name(self):
-        return "action_submit_booking"
-
-    def run(self, dispatcher, tracker, domain):
+    # --------------------------
+    # FORM SUBMISSION
+    # --------------------------
+    def submit(self, dispatcher, tracker, domain):
+        """Called when all slots are filled. Triggers booking summary."""
         dispatcher.utter_message(template="utter_summary")
         return [SlotSet("booking_ready", True)]
 
+
+
+# ============================================================
+# FORM SUBMISSION
+# ============================================================
 class ActionSubmitBookingConfirmed(Action):
-    """Confirm the booking and reset all slots."""
-    
     def name(self):
         return "action_submit_booking_confirmed"
 
@@ -208,12 +206,15 @@ class ActionSubmitBookingConfirmed(Action):
             f"✅ Thank you {name}, your booking is confirmed!" if name else "✅ Your booking is confirmed!"
         )
 
-        # Clear all booking-related slots and active form
-        slots_to_reset = [
+        # Reset all booking slots
+        reset_slots = [
             "booking_ready", "name", "checkin", "checkout", "guests",
             "room_type", "breakfast", "payment", "refund", "requested_slot"
         ]
-        return [SlotSet(slot, None) for slot in slots_to_reset] + [ActiveLoop(None)]
+
+        events = [SlotSet(slot, None) for slot in reset_slots]
+        events.append(ActiveLoop(None))
+        return events
 
 # ============================================================
 # CANCEL BOOKING
@@ -231,20 +232,3 @@ class ActionCancelBooking(Action):
             "room_type", "breakfast", "payment", "refund", "requested_slot"
         ]
         return [SlotSet(slot, None) for slot in slots_to_reset] + [ActiveLoop(None)]
-
-# ============================================================
-# START NEW BOOKING
-# ============================================================
-class ActionStartBooking(Action):
-    """Reset all previous booking info and activate the booking form."""
-    
-    def name(self):
-        return "action_start_booking"
-
-    def run(self, dispatcher, tracker, domain):
-        slots_to_clear = [
-            "booking_ready", "name", "checkin", "checkout", "guests",
-            "room_type", "breakfast", "payment", "refund", "requested_slot"
-        ]
-        # Reset slots and activate form
-        return [SlotSet(slot, None) for slot in slots_to_clear] + [ActiveLoop("booking_form")]
