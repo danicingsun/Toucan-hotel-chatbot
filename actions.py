@@ -13,80 +13,53 @@ ROOM_CAPACITY = {"single": 1, "double": 2, "triple": 3, "suite": 4}
 YES_VALUES = {"yes", "y", "true"}
 NO_VALUES = {"no", "n", "false"}
 
+# ============================================================
+# UTILITY FUNCTIONS
+# ============================================================
 
-# ============================================================
-# HELPER FUNCTIONS
-# ============================================================
 def normalize_text(value):
-    """Convert a string to lowercase and strip spaces."""
+    """Normalize text for comparison."""
     return value.strip().lower() if value else None
 
-
 def unclear_value(dispatcher):
-    """Send a generic message when input is unclear."""
+    """Send a generic message when input is not understood."""
     dispatcher.utter_message(
         text="I’m not sure I understood that. Could you please repeat your answer?"
     )
 
-
 def form_is_active(tracker):
-    """Check if a form is currently active."""
+    """Check if any form is currently active."""
     return tracker.active_loop is not None
 
-
 # ============================================================
-# BASE VALIDATION CLASS
+# FORM VALIDATION
 # ============================================================
 class ValidateBookingForm(FormValidationAction):
-    """Validation class for the booking form."""
-
+    """Validates each slot of the booking form."""
+    
     def name(self):
         return "validate_booking_form"
 
-    # -------------------------
-    # Helper functions
-    # -------------------------
+    # Cancel intent check
     def _is_cancel(self, tracker):
-        """Check if the user wants to cancel the booking."""
         return tracker.latest_message.get("intent", {}).get("name") == "stop"
 
-    def _validate_slot(self, tracker, dispatcher):
-        """
-        Common early checks for all slots:
-        - If the form is not active, skip validation.
-        - If the user wants to cancel, stop the form.
-        """
+    def validate_name(self, value, dispatcher, tracker, domain):
         if not form_is_active(tracker) or self._is_cancel(tracker):
             return {"requested_slot": None}
-        return None
-
-    # -------------------------
-    # Slot validation methods
-    # -------------------------
-    def validate_name(self, value, dispatcher, tracker, domain):
-        result = self._validate_slot(tracker, dispatcher)
-        if result:
-            return result
-
-        if not value or len(value.split()) > 4 or any(
-            word in value.lower()
-            for word in ["book", "start", "cancel", "stop", "booking", "deny", "room", "please"]
-        ):
+        # Reject invalid names
+        if not value or len(value.split()) > 4 or any(word in value.lower() for word in ["book", "start", "cancel", "stop", "booking", "deny", "room", "please"]):
             unclear_value(dispatcher)
             return {"name": None}
-
         dispatcher.utter_message(f"Great, I have the main guest name as {value.strip()}.")
         return {"name": value.strip()}
 
     def validate_checkin(self, value, dispatcher, tracker, domain):
-        result = self._validate_slot(tracker, dispatcher)
-        if result:
-            return result
-
+        if not form_is_active(tracker) or self._is_cancel(tracker):
+            return {"requested_slot": None}
         if not value:
             unclear_value(dispatcher)
             return {"checkin": None}
-
         try:
             date = datetime.strptime(value, DATE_FORMAT).date()
             if date <= datetime.today().date():
@@ -99,14 +72,11 @@ class ValidateBookingForm(FormValidationAction):
             return {"checkin": None}
 
     def validate_checkout(self, value, dispatcher, tracker, domain):
-        result = self._validate_slot(tracker, dispatcher)
-        if result:
-            return result
-
+        if not form_is_active(tracker) or self._is_cancel(tracker):
+            return {"requested_slot": None}
         if not value:
             unclear_value(dispatcher)
             return {"checkout": None}
-
         try:
             checkout = datetime.strptime(value, DATE_FORMAT).date()
             checkin = tracker.get_slot("checkin")
@@ -122,14 +92,11 @@ class ValidateBookingForm(FormValidationAction):
             return {"checkout": None}
 
     def validate_guests(self, value, dispatcher, tracker, domain):
-        result = self._validate_slot(tracker, dispatcher)
-        if result:
-            return result
-
+        if not form_is_active(tracker) or self._is_cancel(tracker):
+            return {"requested_slot": None}
         if not value:
             unclear_value(dispatcher)
             return {"guests": None}
-
         try:
             guests = int(value)
             if 1 <= guests <= MAX_GUESTS:
@@ -137,15 +104,12 @@ class ValidateBookingForm(FormValidationAction):
                 return {"guests": str(guests)}
         except Exception:
             pass
-
-        dispatcher.utter_message(f"Please enter a number between 1 and {MAX_GUESTS}.")
+        dispatcher.utter_message("Please enter a number between 1 and 4.")
         return {"guests": None}
 
     def validate_room_type(self, value, dispatcher, tracker, domain):
-        result = self._validate_slot(tracker, dispatcher)
-        if result:
-            return result
-
+        if not form_is_active(tracker) or self._is_cancel(tracker):
+            return {"requested_slot": None}
         if not value:
             unclear_value(dispatcher)
             return {"room_type": None}
@@ -162,19 +126,15 @@ class ValidateBookingForm(FormValidationAction):
             return {"room_type": None}
 
         if int(guests) > ROOM_CAPACITY[room_type]:
-            dispatcher.utter_message(
-                f"A {room_type} room can host up to {ROOM_CAPACITY[room_type]} guest(s)."
-            )
+            dispatcher.utter_message(f"A {room_type} room can host up to {ROOM_CAPACITY[room_type]} guest(s).")
             return {"room_type": None}
 
         dispatcher.utter_message(f"{room_type.capitalize()} room selected.")
         return {"room_type": room_type}
 
     def validate_breakfast(self, value, dispatcher, tracker, domain):
-        result = self._validate_slot(tracker, dispatcher)
-        if result:
-            return result
-
+        if not form_is_active(tracker) or self._is_cancel(tracker):
+            return {"requested_slot": None}
         if not value:
             unclear_value(dispatcher)
             return {"breakfast": None}
@@ -191,10 +151,8 @@ class ValidateBookingForm(FormValidationAction):
         return {"breakfast": None}
 
     def validate_payment(self, value, dispatcher, tracker, domain):
-        result = self._validate_slot(tracker, dispatcher)
-        if result:
-            return result
-
+        if not form_is_active(tracker) or self._is_cancel(tracker):
+            return {"requested_slot": None}
         if not value:
             unclear_value(dispatcher)
             return {"payment": None}
@@ -211,10 +169,8 @@ class ValidateBookingForm(FormValidationAction):
         return {"payment": None}
 
     def validate_refund(self, value, dispatcher, tracker, domain):
-        result = self._validate_slot(tracker, dispatcher)
-        if result:
-            return result
-
+        if not form_is_active(tracker) or self._is_cancel(tracker):
+            return {"requested_slot": None}
         if not value:
             unclear_value(dispatcher)
             return {"refund": None}
@@ -227,13 +183,12 @@ class ValidateBookingForm(FormValidationAction):
         dispatcher.utter_message("Please choose refundable or non-refundable.")
         return {"refund": None}
 
-
 # ============================================================
-# FORM SUBMISSION ACTIONS
+# FORM SUBMISSION
 # ============================================================
 class ActionSubmitBooking(Action):
-    """Trigger after the form is completed but before confirmation."""
-
+    """Submit booking summary and mark booking as ready."""
+    
     def name(self):
         return "action_submit_booking"
 
@@ -241,39 +196,55 @@ class ActionSubmitBooking(Action):
         dispatcher.utter_message(template="utter_summary")
         return [SlotSet("booking_ready", True)]
 
-
 class ActionSubmitBookingConfirmed(Action):
-    """Confirm the booking and clear all form slots."""
-
+    """Confirm the booking and reset all slots."""
+    
     def name(self):
         return "action_submit_booking_confirmed"
 
     def run(self, dispatcher, tracker, domain):
         name = tracker.get_slot("name")
         dispatcher.utter_message(
-            f"✅ Thank you {name}, your booking is confirmed!"
-            if name else "✅ Your booking is confirmed!"
+            f"✅ Thank you {name}, your booking is confirmed!" if name else "✅ Your booking is confirmed!"
         )
 
-        return [SlotSet(slot, None) for slot in [
+        # Clear all booking-related slots and active form
+        slots_to_reset = [
             "booking_ready", "name", "checkin", "checkout", "guests",
             "room_type", "breakfast", "payment", "refund", "requested_slot"
-        ]] + [ActiveLoop(None)]
-
+        ]
+        return [SlotSet(slot, None) for slot in slots_to_reset] + [ActiveLoop(None)]
 
 # ============================================================
-# CANCEL BOOKING ACTION
+# CANCEL BOOKING
 # ============================================================
 class ActionCancelBooking(Action):
-    """Cancel the booking and clear all slots."""
-
+    """Cancel booking mid-form or after summary, clear slots."""
+    
     def name(self):
         return "action_cancel_booking"
 
     def run(self, dispatcher, tracker, domain):
         dispatcher.utter_message("Your booking has been cancelled. All details were cleared.")
-
-        return [SlotSet(slot, None) for slot in [
+        slots_to_reset = [
             "booking_ready", "name", "checkin", "checkout", "guests",
             "room_type", "breakfast", "payment", "refund", "requested_slot"
-        ]] + [ActiveLoop(None)]
+        ]
+        return [SlotSet(slot, None) for slot in slots_to_reset] + [ActiveLoop(None)]
+
+# ============================================================
+# START NEW BOOKING
+# ============================================================
+class ActionStartBooking(Action):
+    """Reset all previous booking info and activate the booking form."""
+    
+    def name(self):
+        return "action_start_booking"
+
+    def run(self, dispatcher, tracker, domain):
+        slots_to_clear = [
+            "booking_ready", "name", "checkin", "checkout", "guests",
+            "room_type", "breakfast", "payment", "refund", "requested_slot"
+        ]
+        # Reset slots and activate form
+        return [SlotSet(slot, None) for slot in slots_to_clear] + [ActiveLoop("booking_form")]
