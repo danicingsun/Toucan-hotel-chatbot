@@ -178,7 +178,10 @@ class ValidateBookingForm(FormValidationAction):
         norm = normalize_text(value)
         if norm in {"refundable", "non-refundable", "nonrefundable"}:
             dispatcher.utter_message(f"Refund policy set to {norm}.")
-            return {"refund": norm}
+            return [
+               SlotSet("booking_ready", True),
+               SlotSet("refund", norm),
+            ]
 
         dispatcher.utter_message("Please choose refundable or non-refundable.")
         return {"refund": None}
