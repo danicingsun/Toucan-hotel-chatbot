@@ -13,18 +13,8 @@ rules:
     - action: booking_form
     - active_loop: booking_form
 
-# -------------------------------
-# Continue booking
-# -------------------------------
-- rule: Continue booking form
-  condition:
-    - active_loop: booking_form
-  steps:
-    - action: booking_form
-    - active_loop: booking_form
-
 # --------------------------------------------------
-# Form finished → show summary
+# Submit booking when form is complete
 # --------------------------------------------------
 - rule: Form finished
   condition:
@@ -32,9 +22,6 @@ rules:
   steps:
     - action: booking_form
     - active_loop: null
-
-- rule: Show booking summary after form
-  steps:
     - action: action_submit_booking
 
 
