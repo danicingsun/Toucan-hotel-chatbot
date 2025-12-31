@@ -10,19 +10,22 @@ rules:
     - active_loop: null
   steps:
     - intent: book_hotel
-    - action: action_clear_booking_slots
     - action: booking_form
     - active_loop: booking_form
 
 # --------------------------------------------------
-# Continue booking
+# Submit booking
 # --------------------------------------------------
-- rule: Continue booking form 
+- rule: Submit booking form 
   condition: 
     - active_loop: booking_form 
   steps: 
     - action: booking_form 
     - active_loop: booking_form
+
+- rule: Show booking summary after form
+  steps:
+    - action: action_submit_booking
 
 
 # --------------------------------------------------
@@ -35,17 +38,6 @@ rules:
     - intent: stop
     - action: action_cancel_booking
     - active_loop: null
-
-# --------------------------------------------------
-# Submit form → show summary
-# --------------------------------------------------
-- rule: Submit booking form
-  condition:
-    - active_loop: booking_form
-  steps:
-    - action: booking_form
-    - active_loop: null
-    - action: action_submit_booking
 
 # --------------------------------------------------
 # Confirm booking after summary
