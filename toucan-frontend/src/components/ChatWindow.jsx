@@ -13,7 +13,7 @@ function getSenderId() {
 }
 
 async function sendToRasaWithSender(message, senderId) { 
-  const res = await fetch("/webhooks/rest/webhook", { 
+  const res = await fetch("https://toucan-hotel-chatbot-llsu.onrender.com/webhooks/rest/webhook", { 
     method: "POST", 
     headers: { "Content-Type": "application/json" }, 
     body: JSON.stringify({ 
