@@ -108,7 +108,7 @@ class ValidateBookingForm(FormValidationAction):
 
         if not guests:
             dispatcher.utter_message("Let’s confirm the number of guests first.")
-            return {"room_type": None, "requested_slot": "guests"}
+            return {"room_type": None}
 
         if room_type not in ROOM_CAPACITY:
             dispatcher.utter_message("Available room types: single, double, triple, suite.")
