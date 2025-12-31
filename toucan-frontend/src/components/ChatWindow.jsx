@@ -107,7 +107,7 @@ export default function ChatWindow() {
 
       <form className="composer" onSubmit={handleSendText}>
         <input
-          placeholder='Type a message or click a suggestion (e.g. "yes")'
+          placeholder='Type a reply or click a suggestion'
           value={input}
           onChange={(e) => setInput(e.target.value)}
         />
