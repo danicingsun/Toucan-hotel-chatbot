@@ -21,6 +21,9 @@ def unclear_value(dispatcher: CollectingDispatcher):
         text="I’m not sure I understood that. Could you please repeat your answer?"
     )
 
+def form_is_active(tracker):
+    return tracker.active_loop is not None
+
 
 # ============================================================
 # FORM VALIDATION
@@ -34,6 +37,11 @@ class ValidateBookingForm(FormValidationAction):
         return tracker.latest_message.intent.get("name") == "stop"
 
     def validate_name(self, value, dispatcher, tracker, domain):
+        # Do not allow validation if the form is unactive
+        if not form_is_active(tracker):
+            return {}
+        
+        # Check if there is intent to stop the booking process first
         if tracker.latest_message.intent.get("name") == "stop": 
             return {"requested_slot": None}
         # Reject values that are clearly not names 
@@ -44,6 +52,13 @@ class ValidateBookingForm(FormValidationAction):
         return {"name": value.strip()}
         
     def validate_checkin(self, value, dispatcher, tracker, domain):
+        # Do not allow validation if the form is unactive
+        if not form_is_active(tracker):
+            return {}
+        
+        # Check if there is intent to stop the booking process first
+        if not form_is_active(tracker):
+            return {}
         if tracker.latest_message.intent.get("name") == "stop": 
             return {"requested_slot": None}
         if not value:
@@ -61,6 +76,11 @@ class ValidateBookingForm(FormValidationAction):
             return {"checkin": None}
 
     def validate_checkout(self, value, dispatcher, tracker, domain):
+        # Do not allow validation if the form is unactive
+        if not form_is_active(tracker):
+            return {}
+        
+        # Check if there is intent to stop the booking process first
         if tracker.latest_message.intent.get("name") == "stop": 
             return {"requested_slot": None}
         if not value:
@@ -81,6 +101,11 @@ class ValidateBookingForm(FormValidationAction):
             return {"checkout": None}
 
     def validate_guests(self, value, dispatcher, tracker, domain):
+        # Do not allow validation if the form is unactive
+        if not form_is_active(tracker):
+            return {}
+        
+        # Check if there is intent to stop the booking process first
         if tracker.latest_message.intent.get("name") == "stop": 
             return {"requested_slot": None}
         if not value:
@@ -97,6 +122,11 @@ class ValidateBookingForm(FormValidationAction):
         return {"guests": None}
 
     def validate_room_type(self, value, dispatcher, tracker, domain):
+        # Do not allow validation if the form is unactive
+        if not form_is_active(tracker):
+            return {}
+        
+        # Check if there is intent to stop the booking process first
         if tracker.latest_message.intent.get("name") == "stop": 
             return {"requested_slot": None}
         if not value:
@@ -124,6 +154,11 @@ class ValidateBookingForm(FormValidationAction):
         return {"room_type": room_type}
 
     def validate_breakfast(self, value, dispatcher, tracker, domain):
+        # Do not allow validation if the form is unactive
+        if not form_is_active(tracker):
+            return {}
+        
+        # Check if there is intent to stop the booking process first
         if tracker.latest_message.intent.get("name") == "stop": 
             return {"requested_slot": None}
         if not value:
@@ -142,6 +177,11 @@ class ValidateBookingForm(FormValidationAction):
         return {"breakfast": None}
 
     def validate_payment(self, value, dispatcher, tracker, domain):
+        # Do not allow validation if the form is unactive
+        if not form_is_active(tracker):
+            return {}
+        
+        # Check if there is intent to stop the booking process first
         if tracker.latest_message.intent.get("name") == "stop": 
             return {"requested_slot": None}
         if not value:
@@ -160,6 +200,11 @@ class ValidateBookingForm(FormValidationAction):
         return {"payment": None}
 
     def validate_refund(self, value, dispatcher, tracker, domain):
+        # Do not allow validation if the form is unactive
+        if not form_is_active(tracker):
+            return {}
+        
+        # Check if there is intent to stop the booking process first
         if tracker.latest_message.intent.get("name") == "stop": 
             return {"requested_slot": None}
         if not value:
@@ -239,27 +284,4 @@ class ActionCancelBooking(Action):
             SlotSet("refund", None),
             SlotSet("requested_slot", None),
             ActiveLoop(None),
-        ]
-
-
-# ============================================================
-# CLEAR SLOTS (used when restarting or denying)
-# ============================================================
-class ActionClearBookingSlots(Action):
-    def name(self) -> Text:
-        return "action_clear_booking_slots"
-
-    def run(self, dispatcher, tracker, domain):
-
-        return [
-            SlotSet("booking_ready", None),
-            SlotSet("name", None),
-            SlotSet("checkin", None),
-            SlotSet("checkout", None),
-            SlotSet("guests", None),
-            SlotSet("room_type", None),
-            SlotSet("breakfast", None),
-            SlotSet("payment", None),
-            SlotSet("refund", None),
-            SlotSet("requested_slot", None),
         ]

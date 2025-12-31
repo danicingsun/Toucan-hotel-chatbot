@@ -13,15 +13,25 @@ rules:
     - action: booking_form
     - active_loop: booking_form
 
-# --------------------------------------------------
-# Submit booking
-# --------------------------------------------------
-- rule: Submit booking form 
-  condition: 
-    - active_loop: booking_form 
-  steps: 
-    - action: booking_form 
+# -------------------------------
+# Continue booking
+# -------------------------------
+- rule: Continue booking form
+  condition:
     - active_loop: booking_form
+  steps:
+    - action: booking_form
+    - active_loop: booking_form
+
+# --------------------------------------------------
+# Form finished → show summary
+# --------------------------------------------------
+- rule: Form finished
+  condition:
+    - active_loop: booking_form
+  steps:
+    - action: booking_form
+    - active_loop: null
 
 - rule: Show booking summary after form
   steps:
@@ -29,7 +39,7 @@ rules:
 
 
 # --------------------------------------------------
-# Cancel booking while form is active
+# Stop booking while form is active
 # --------------------------------------------------
 - rule: Cancel booking while form is active
   condition:
@@ -59,6 +69,5 @@ rules:
         - booking_ready: true
   steps:
     - intent: deny
-    - action: action_clear_booking_slots
     - action: action_cancel_booking
     - active_loop: null
