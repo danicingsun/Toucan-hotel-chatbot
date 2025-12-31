@@ -189,7 +189,11 @@ class ValidateBookingForm(FormValidationAction):
     def submit(self, dispatcher, tracker, domain):
         """Called when all slots are filled. Triggers booking summary."""
         dispatcher.utter_message(template="utter_summary")
-        return [SlotSet("booking_ready", True)]
+        # Stop the form (active_loop = null) so rules can detect booking_ready
+        return [
+           SlotSet("booking_ready", True),
+           ActiveLoop(None)  # Important!
+        ]
 
 
 
