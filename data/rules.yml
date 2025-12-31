@@ -16,7 +16,7 @@ rules:
 # --------------------------------------------------
 # Submit booking when form is complete
 # --------------------------------------------------
-- rule: Form finished
+- rule: Submit booking
   condition:
     - active_loop: booking_form
   steps:
@@ -24,6 +24,15 @@ rules:
     - active_loop: null
     - action: action_submit_booking
 
+
+# --------------------------------------------------
+# Continue booking
+# --------------------------------------------------
+- rule: Continue booking form
+  condition:
+    - active_loop: booking_form
+  steps:
+    - action: booking_form
 
 # --------------------------------------------------
 # Stop booking while form is active
