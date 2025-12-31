@@ -3,7 +3,7 @@ version: "3.1"
 rules:
 
 # --------------------------------------------------
-# Start booking if not blocked and form inactive
+# Start booking 
 # --------------------------------------------------
 - rule: Start booking
   condition:
@@ -13,6 +13,17 @@ rules:
     - action: action_clear_booking_slots
     - action: booking_form
     - active_loop: booking_form
+
+# --------------------------------------------------
+# Continue booking
+# --------------------------------------------------
+- rule: Continue booking form 
+  condition: 
+    - active_loop: booking_form 
+  steps: 
+    - action: booking_form 
+    - active_loop: booking_form
+
 
 # --------------------------------------------------
 # Cancel booking while form is active

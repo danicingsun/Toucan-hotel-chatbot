@@ -140,14 +140,6 @@ slots:
     mappings:
       - type: custom
 
-  # Block form restart after cancellation
-  booking_blocked:
-    type: bool
-    influence_conversation: true
-    initial_value: false
-    mappings:
-      - type: custom
-
 forms:
   booking_form:
     required_slots:
