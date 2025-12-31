@@ -31,9 +31,6 @@ rules:
   steps: 
     - action: booking_form 
     - active_loop: null 
-    - action: utter_summary 
-    - slot_was_set: 
-        - booking_ready: true
 
 # --------------------------------------------------
 # Cancel booking while form is active
@@ -50,20 +47,15 @@ rules:
 # Confirm booking after summary
 # --------------------------------------------------
 - rule: Confirm booking
-  condition:
-    - slot_was_set:
-        - booking_ready: true
   steps:
     - intent: affirm
     - action: action_submit_booking_confirmed
+    - active_loop: null
 
 # --------------------------------------------------
 # Deny booking after summary
 # --------------------------------------------------
 - rule: Deny booking
-  condition:
-    - slot_was_set:
-        - booking_ready: true
   steps:
     - intent: deny
     - action: action_cancel_booking

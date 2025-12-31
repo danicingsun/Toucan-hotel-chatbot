@@ -27,10 +27,6 @@ def unclear_value(dispatcher):
         text="I’m not sure I understood that. Could you please repeat your answer?"
     )
 
-def form_is_active(tracker):
-    """Check if any form is currently active."""
-    return tracker.active_loop is not None
-
 # ============================================================
 # FORM VALIDATION
 # ============================================================
@@ -45,7 +41,7 @@ class ValidateBookingForm(FormValidationAction):
         return tracker.latest_message.get("intent", {}).get("name") == "stop"
 
     def validate_name(self, value, dispatcher, tracker, domain):
-        if not form_is_active(tracker) or self._is_cancel(tracker):
+        if self._is_cancel(tracker):
             return {"requested_slot": None}
         # Reject invalid names
         if not value or len(value.split()) > 4 or any(word in value.lower() for word in ["book", "start", "cancel", "stop", "booking", "deny", "room", "please"]):
@@ -55,7 +51,7 @@ class ValidateBookingForm(FormValidationAction):
         return {"name": value.strip()}
 
     def validate_checkin(self, value, dispatcher, tracker, domain):
-        if not form_is_active(tracker) or self._is_cancel(tracker):
+        if self._is_cancel(tracker):
             return {"requested_slot": None}
         if not value:
             unclear_value(dispatcher)
@@ -72,7 +68,7 @@ class ValidateBookingForm(FormValidationAction):
             return {"checkin": None}
 
     def validate_checkout(self, value, dispatcher, tracker, domain):
-        if not form_is_active(tracker) or self._is_cancel(tracker):
+        if self._is_cancel(tracker):
             return {"requested_slot": None}
         if not value:
             unclear_value(dispatcher)
@@ -92,7 +88,7 @@ class ValidateBookingForm(FormValidationAction):
             return {"checkout": None}
 
     def validate_guests(self, value, dispatcher, tracker, domain):
-        if not form_is_active(tracker) or self._is_cancel(tracker):
+        if self._is_cancel(tracker):
             return {"requested_slot": None}
         if not value:
             unclear_value(dispatcher)
@@ -108,7 +104,7 @@ class ValidateBookingForm(FormValidationAction):
         return {"guests": None}
 
     def validate_room_type(self, value, dispatcher, tracker, domain):
-        if not form_is_active(tracker) or self._is_cancel(tracker):
+        if self._is_cancel(tracker):
             return {"requested_slot": None}
         if not value:
             unclear_value(dispatcher)
@@ -133,7 +129,7 @@ class ValidateBookingForm(FormValidationAction):
         return {"room_type": room_type}
 
     def validate_breakfast(self, value, dispatcher, tracker, domain):
-        if not form_is_active(tracker) or self._is_cancel(tracker):
+        if self._is_cancel(tracker):
             return {"requested_slot": None}
         if not value:
             unclear_value(dispatcher)
@@ -151,7 +147,7 @@ class ValidateBookingForm(FormValidationAction):
         return {"breakfast": None}
 
     def validate_payment(self, value, dispatcher, tracker, domain):
-        if not form_is_active(tracker) or self._is_cancel(tracker):
+        if self._is_cancel(tracker):
             return {"requested_slot": None}
         if not value:
             unclear_value(dispatcher)
@@ -169,7 +165,7 @@ class ValidateBookingForm(FormValidationAction):
         return {"payment": None}
 
     def validate_refund(self, value, dispatcher, tracker, domain):
-        if not form_is_active(tracker) or self._is_cancel(tracker):
+        if self._is_cancel(tracker):
             return {"requested_slot": None}
         if not value:
             unclear_value(dispatcher)
@@ -179,7 +175,6 @@ class ValidateBookingForm(FormValidationAction):
         if norm in {"refundable", "non-refundable", "nonrefundable"}:
             dispatcher.utter_message(f"Refund policy set to {norm}.")
             return [
-               SlotSet("booking_ready", True),
                SlotSet("refund", norm),
             ]
 
