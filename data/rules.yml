@@ -22,6 +22,16 @@ rules:
   steps:
     - action: booking_form
 
+# --------------------------------------------------
+# Submit form
+# --------------------------------------------------
+- rule: Submit booking form
+  condition:
+    - active_loop: booking_form
+    - slot_was_set:
+        - requested_slot: null
+  steps:
+    - action: booking_form
 
 # --------------------------------------------------
 # Cancel booking while form is active
