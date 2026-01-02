@@ -53,7 +53,9 @@ class ValidateBookingForm(FormValidationAction):
 
        if name == "stop" and confidence > 0.7: 
            if any(w in text for w in stop_words): 
-               return True return False
+               return True 
+     
+       return False
 
     def validate_name(self, value, dispatcher, tracker, domain):
         if self._is_cancel(tracker):
