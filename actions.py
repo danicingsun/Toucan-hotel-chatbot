@@ -38,7 +38,22 @@ class ValidateBookingForm(FormValidationAction):
 
     # Cancel intent check
     def _is_cancel(self, tracker):
-        return tracker.latest_message.get("intent", {}).get("name") == "stop"
+       intent = tracker.latest_message.get("intent", {}) 
+       name = intent.get("name") 
+       confidence = intent.get("confidence", 0) 
+      
+       # Only treat as cancel if: 
+       # 1. Intent is stop 
+       # 2. Confidence is high enough 
+       # 3. The text actually contains a stop-like phrase #
+
+       text = tracker.latest_message.get("text", "").lower() 
+
+       stop_words = {"stop", "cancel", "abort", "quit", "end", "no more", "go away"} 
+
+       if name == "stop" and confidence > 0.7: 
+           if any(w in text for w in stop_words): 
+               return True return False
 
     def validate_name(self, value, dispatcher, tracker, domain):
         if self._is_cancel(tracker):
