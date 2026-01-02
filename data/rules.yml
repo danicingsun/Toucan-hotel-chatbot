@@ -19,6 +19,8 @@ rules:
 - rule: Continue booking form
   condition:
     - active_loop: booking_form
+    - slot_was_set:
+        - requested_slot: true
   steps:
     - action: booking_form
 
