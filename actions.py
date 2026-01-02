@@ -191,6 +191,7 @@ class ValidateBookingForm(FormValidationAction):
         norm = normalize_text(value)
         if norm in {"refundable", "non-refundable", "nonrefundable"}:
             dispatcher.utter_message(f"Refund policy set to {norm}.")
+            print("DEBUG INTENT:", tracker.latest_message.get("intent"))
             return {"refund": norm}
 
         dispatcher.utter_message("Please choose refundable or non-refundable.")
