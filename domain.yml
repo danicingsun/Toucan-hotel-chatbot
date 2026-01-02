@@ -191,9 +191,9 @@ responses:
     - text: "Do you prefer a refundable or non-refundable rate?"
       buttons:
         - title: "Refundable"
-          payload: "refundable"
+          payload: '/provide_refund{"refund":"refundable"}'
         - title: "Non-refundable"
-          payload: "non-refundable"
+          payload: '/provide_refund{"refund":"non-refundable"}'
 
   utter_summary:
     - text: |
