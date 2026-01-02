@@ -184,6 +184,7 @@ class ValidateBookingForm(FormValidationAction):
     # --------------------------
     def submit(self, dispatcher, tracker, domain):
         """Called when all slots are filled. Triggers booking summary."""
+        dispatcher.utter_message(f"Submit is triggered")
         dispatcher.utter_message(template="utter_summary")
         return [
             SlotSet("booking_ready", True),
