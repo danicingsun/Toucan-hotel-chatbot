@@ -185,24 +185,9 @@ class ValidateBookingForm(FormValidationAction):
     def submit(self, dispatcher, tracker, domain):
         """Called when all slots are filled. Triggers booking summary."""
         dispatcher.utter_message(template="utter_summary")
-        # Stop the form (active_loop = null) so rules can detect booking_ready
-        return [
-           SlotSet("booking_ready", True),
-           ActiveLoop(None)  # Important!
-        ]
+        dispatcher.utter_message(template="utter_summary")
+        return [SlotSet("booking_ready", True)]
 
-    # --------------------------
-    # Generic validate function
-    # --------------------------
-    def validate(self, dispatcher, tracker, domain): 
-        """Called after each slot validation. Detect when form is complete.""" 
-        required = ["name", "checkin", "checkout", "guests", "room_type", "breakfast", "payment", "refund"] 
-        filled = all(tracker.get_slot(s) for s in required) 
-
-        if filled: 
-            # Tell Rasa the form is finished 
-            return {"requested_slot": None} 
-        return {}
 
 # ============================================================
 # FORM SUBMISSION
