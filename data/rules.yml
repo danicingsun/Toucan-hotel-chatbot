@@ -23,16 +23,6 @@ rules:
     - action: booking_form
 
 # --------------------------------------------------
-# Submit form
-# --------------------------------------------------
-- rule: Submit booking form 
-  condition: 
-    - active_loop: booking_form 
-  steps: 
-    - action: booking_form 
-    - active_loop: null 
-
-# --------------------------------------------------
 # Cancel booking while form is active
 # --------------------------------------------------
 - rule: Cancel booking while form is active
@@ -40,23 +30,26 @@ rules:
     - active_loop: booking_form
   steps:
     - intent: stop
-    - action: action_cancel_booking
+    - action: action_deactivate_loop
     - active_loop: null
+    - action: action_cancel_booking
 
 # --------------------------------------------------
 # Confirm booking after summary
 # --------------------------------------------------
 - rule: Confirm booking
+  condition: 
+    - active_loop: null 
   steps:
     - intent: affirm
     - action: action_submit_booking_confirmed
-    - active_loop: null
 
 # --------------------------------------------------
 # Deny booking after summary
 # --------------------------------------------------
 - rule: Deny booking
+  condition: 
+    - active_loop: null
   steps:
     - intent: deny
     - action: action_cancel_booking
-    - active_loop: null
