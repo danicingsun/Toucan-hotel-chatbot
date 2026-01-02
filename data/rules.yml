@@ -13,27 +13,6 @@ rules:
     - action: booking_form
     - active_loop: booking_form
 
-# --------------------------------------------------
-# Continue filling form
-# --------------------------------------------------
-- rule: Continue booking form
-  condition:
-    - active_loop: booking_form
-    - slot_was_set:
-        - requested_slot: true
-  steps:
-    - action: booking_form
-
-# --------------------------------------------------
-# Submit form
-# --------------------------------------------------
-- rule: Submit booking form
-  condition:
-    - active_loop: booking_form
-    - slot_was_set:
-        - requested_slot: null
-  steps:
-    - action: booking_form
 
 # --------------------------------------------------
 # Cancel booking while form is active
