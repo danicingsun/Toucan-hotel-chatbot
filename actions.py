@@ -213,6 +213,42 @@ class ValidateBookingForm(FormValidationAction):
             ActiveLoop(None)
         ]
 
+    def slot_mappings(self): 
+        return { 
+            "name": [ 
+                self.from_text(intent=None), 
+                self.from_entity(entity="name"), 
+            ], 
+            "checkin": [ 
+                self.from_entity(entity="checkin"), 
+                self.from_text(intent=None), 
+            ], 
+            "checkout": [ 
+                self.from_entity(entity="checkout"), 
+                self.from_text(intent=None), 
+            ], 
+            "guests": [ 
+                self.from_entity(entity="guests"), 
+                self.from_text(intent=None), 
+            ], 
+            "room_type": [ 
+                self.from_entity(entity="room_type"), 
+                self.from_text(intent=None), 
+            ], 
+            "breakfast": [ 
+                self.from_entity(entity="breakfast"), 
+                self.from_text(intent=None), # supports "yes"/"no" buttons 
+            ], 
+            "payment": [ 
+                self.from_entity(entity="payment"), 
+                self.from_text(intent=None), # supports "credit card"/"cash" buttons 
+            ], 
+            "refund": [ 
+                self.from_entity(entity="refund"), 
+                self.from_text(intent=None), # supports "refundable"/"non-refundable" buttons 
+            ], 
+        }
+
 
 # ============================================================
 # FORM SUBMISSION
