@@ -126,11 +126,11 @@ class ValidateBookingForm(FormValidationAction):
 
     def validate_refund(self, value, dispatcher, tracker, domain):
         # DEBUG: Print incoming info
-        print("===== REFUND VALIDATOR CALLED =====")
-        print("Latest message:", tracker.latest_message)
-        print("Text received:", tracker.latest_message.get("text"))
-        print("Intent detected:", tracker.latest_message.get("intent"))
-        print("Entities detected:", tracker.latest_message.get("entities"))
+        dispatcher.utter_message(f"=== REFUND VALIDATOR ===")
+        dispatcher.utter_message(f"Value: {value}")
+        dispatcher.utter_message(f"Requested slot: {tracker.get_slot('requested_slot')}")
+        active_loop = tracker.active_loop.get("name") if tracker.active_loop else None
+        dispatcher.utter_message(f"Active loop: {active_loop}")
         norm = normalize_text(value)
         if norm in {"refundable", "non-refundable", "nonrefundable"}:
             dispatcher.utter_message(f"Refund policy set to {norm}.")
