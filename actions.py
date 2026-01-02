@@ -125,6 +125,12 @@ class ValidateBookingForm(FormValidationAction):
         return {"payment": None}
 
     def validate_refund(self, value, dispatcher, tracker, domain):
+        # DEBUG: Print incoming info
+        print("===== REFUND VALIDATOR CALLED =====")
+        print("Latest message:", tracker.latest_message)
+        print("Text received:", tracker.latest_message.get("text"))
+        print("Intent detected:", tracker.latest_message.get("intent"))
+        print("Entities detected:", tracker.latest_message.get("entities"))
         norm = normalize_text(value)
         if norm in {"refundable", "non-refundable", "nonrefundable"}:
             dispatcher.utter_message(f"Refund policy set to {norm}.")
