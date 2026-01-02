@@ -163,11 +163,23 @@ class ActionCancelBooking(Action):
         return "action_cancel_booking"
 
     def run(self, dispatcher, tracker, domain):
-        dispatcher.utter_message("Your booking has been cancelled. All details were cleared.")
+        booking_ready = tracker.get_slot("booking_ready")
+
+        if not booking_ready:
+            dispatcher.utter_message(
+                "There is no active booking to cancel."
+            )
+            return []
+
+        dispatcher.utter_message(
+            "Your booking has been cancelled. All details were cleared."
+        )
+
         slots_to_reset = [
             "booking_ready", "name", "checkin", "checkout", "guests",
             "room_type", "breakfast", "payment", "refund", "requested_slot"
         ]
+
         return [SlotSet(slot, None) for slot in slots_to_reset] + [ActiveLoop(None)]
 
 # ============================================================
@@ -178,15 +190,25 @@ class ActionSubmitBookingConfirmed(Action):
         return "action_submit_booking_confirmed"
 
     def run(self, dispatcher, tracker, domain):
+        booking_ready = tracker.get_slot("booking_ready")
+
+        if not booking_ready:
+            dispatcher.utter_message(
+                "There is no completed booking to confirm yet."
+            )
+            return []
+
         name = tracker.get_slot("name")
+
         dispatcher.utter_message(
-            f"✅ Thank you {name}, your booking is confirmed!" if name else "✅ Your booking is confirmed!"
+            f"✅ Thank you {name}, your booking is confirmed! We look forward to welcoming you at our hotel!"
+            if name
+            else "✅ Your booking is confirmed! We look forward to welcoming you at our hotel!"
         )
-        # Reset all booking slots
+
         reset_slots = [
             "booking_ready", "name", "checkin", "checkout", "guests",
             "room_type", "breakfast", "payment", "refund", "requested_slot"
         ]
-        events = [SlotSet(slot, None) for slot in reset_slots]
-        events.append(ActiveLoop(None))
-        return events
+
+        return [SlotSet(slot, None) for slot in reset_slots] + [ActiveLoop(None)]

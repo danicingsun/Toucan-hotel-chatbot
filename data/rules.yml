@@ -22,15 +22,6 @@ rules:
   steps:
     - action: booking_form
 
-# --------------------------------------------------
-# Submit form
-# --------------------------------------------------
-- rule: Submit booking form 
-  condition: 
-    - active_loop: booking_form 
-  steps: 
-    - action: booking_form  
-    - active_loop: null
 
 # --------------------------------------------------
 # Cancel booking while form is active
@@ -41,7 +32,6 @@ rules:
   steps:
     - intent: stop
     - action: action_deactivate_loop
-    - active_loop: null
     - action: action_cancel_booking
 
 # --------------------------------------------------
