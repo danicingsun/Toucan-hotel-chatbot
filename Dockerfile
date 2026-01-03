@@ -20,4 +20,4 @@ USER 1001
 ENV PORT=10000
 EXPOSE 10000
 
-CMD ["sh", "-c", "exec rasa run --enable-api --cors \"*\" -i 0.0.0.0 --port $PORT --model models"]
+CMD ["sh", "-c", "exec rasa run --enable-api --cors \"*\" -i 0.0.0.0 --port $PORT --model models --debug"]
