@@ -23,11 +23,10 @@ rules:
 # Submit booking form # --------------------------------------------------
 - rule: Submit booking form 
   condition: 
-    - active_loop: booking_form 
+    - active_loop: booking_form
   steps: 
-    - action: booking_form 
+    - action: booking_form
     - active_loop: null
-    - action: validate_booking_form 
     - action: booking_form
 
 # --------------------------------------------------
