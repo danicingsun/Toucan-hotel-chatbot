@@ -138,11 +138,7 @@ class ValidateBookingForm(FormValidationAction):
         dispatcher.utter_message("Please choose refundable or non-refundable.")
         return {"refund": None}
 
-class BookingForm(Action):
-    def name(self) -> str:
-        return "booking_form"
-
-    def run(self, dispatcher, tracker, domain):
+     def submit(self, dispatcher, tracker, domain):
         dispatcher.utter_message(response="utter_summary")
         return [SlotSet("booking_ready", True)]
 

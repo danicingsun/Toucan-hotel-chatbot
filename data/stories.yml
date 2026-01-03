@@ -8,9 +8,6 @@ stories:
     - action: utter_greet
     - intent: book_hotel
     - action: booking_form
-    - active_loop: booking_form
-    # form runs, fills slots, and auto-calls submit()
-    - active_loop: null
 
 - story: Confirm completed booking
   steps:

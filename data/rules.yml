@@ -13,6 +13,11 @@ rules:
     - action: action_deactivate_loop
     - action: action_cancel_booking
 
+- rule: Activate booking form
+  steps:
+    - intent: book_hotel
+    - action: booking_form
+    - active_loop: booking_form
 
 - rule: Submit booking form
   condition:
