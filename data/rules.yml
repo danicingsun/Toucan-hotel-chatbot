@@ -15,6 +15,15 @@ rules:
 
 
 # --------------------------------------------------
+# Continue booking
+# --------------------------------------------------
+- rule: Continue booking form
+  condition:
+    - active_loop: booking_form
+  steps:
+    - action: booking_form
+
+# --------------------------------------------------
 # Cancel booking while form is active
 # --------------------------------------------------
 - rule: Cancel booking while form is active
