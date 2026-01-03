@@ -157,9 +157,8 @@ class ValidateBookingForm(FormValidationAction):
     # Form submission
     # --------------------------
     def submit(self, dispatcher, tracker, domain):
-        dispatcher.utter_message("Booking summary:")
-        dispatcher.utter_message(template="utter_summary")
-        return [SlotSet("booking_ready", True), ActiveLoop(None)]
+        dispatcher.utter_message(response="utter_summary")
+        return [SlotSet("booking_ready", True)]
 
 # ============================================================
 # CANCEL BOOKING
