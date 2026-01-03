@@ -6,14 +6,6 @@ intents:
   - stop
   - affirm
   - deny
-  - provide_name
-  - provide_checkin
-  - provide_checkout
-  - provide_guests
-  - provide_room_type
-  - provide_breakfast
-  - provide_payment
-  - provide_refund
 
 entities:
   - name
