@@ -36,7 +36,6 @@ class ValidateBookingForm(FormValidationAction):
         if not value or len(value.split()) > 4 or any(word in value.lower() for word in ["book", "start", "cancel", "stop", "booking", "deny", "room", "please"]):
             unclear_value(dispatcher)
             return {"name": None}
-        dispatcher.utter_message(f"Great, I have the main guest name as {value.strip()}.")
         return {"name": value.strip()}
 
     def validate_checkin(self, value, dispatcher, tracker, domain):
@@ -48,7 +47,6 @@ class ValidateBookingForm(FormValidationAction):
             if date <= datetime.today().date():
                 dispatcher.utter_message("Check-in must be a future date.")
                 return {"checkin": None}
-            dispatcher.utter_message(f"Check-in date set to {value}.")
             return {"checkin": value}
         except Exception:
             dispatcher.utter_message("Please use YYYY-MM-DD format.")
@@ -66,7 +64,6 @@ class ValidateBookingForm(FormValidationAction):
                 if checkout <= checkin_date:
                     dispatcher.utter_message("Checkout must be after the check-in date.")
                     return {"checkout": None}
-            dispatcher.utter_message(f"Check-out date set to {value}.")
             return {"checkout": value}
         except Exception:
             dispatcher.utter_message("Please use YYYY-MM-DD format.")
@@ -76,7 +73,6 @@ class ValidateBookingForm(FormValidationAction):
         try:
             guests = int(value)
             if 1 <= guests <= MAX_GUESTS:
-                dispatcher.utter_message(f"Got it — booking for {guests} guest(s).")
                 return {"guests": str(guests)}
         except Exception:
             pass
@@ -99,16 +95,13 @@ class ValidateBookingForm(FormValidationAction):
             dispatcher.utter_message(f"A {room_type} room can host up to {ROOM_CAPACITY[room_type]} guest(s).")
             return {"room_type": None}
 
-        dispatcher.utter_message(f"{room_type.capitalize()} room selected.")
         return {"room_type": room_type}
 
     def validate_breakfast(self, value, dispatcher, tracker, domain):
         norm = normalize_text(value)
         if norm in YES_VALUES:
-            dispatcher.utter_message("Breakfast will be included.")
             return {"breakfast": "yes"}
         if norm in NO_VALUES:
-            dispatcher.utter_message("No breakfast will be included.")
             return {"breakfast": "no"}
         dispatcher.utter_message("Please answer yes or no.")
         return {"breakfast": None}
@@ -116,10 +109,8 @@ class ValidateBookingForm(FormValidationAction):
     def validate_payment(self, value, dispatcher, tracker, domain):
         norm = normalize_text(value)
         if "credit" in norm:
-            dispatcher.utter_message("Payment method set to credit card.")
             return {"payment": "credit card"}
         if "cash" in norm:
-            dispatcher.utter_message("Payment method set to cash.")
             return {"payment": "cash"}
         dispatcher.utter_message("Please choose credit card or cash.")
         return {"payment": None}
@@ -127,7 +118,6 @@ class ValidateBookingForm(FormValidationAction):
     def validate_refund(self, value, dispatcher, tracker, domain):
         norm = normalize_text(value)
         if norm in {"refundable", "non-refundable", "nonrefundable"}:
-            dispatcher.utter_message(f"Refund policy set to {norm}.")
             return {"refund": norm}
         
         dispatcher.utter_message("Please choose refundable or non-refundable.")
