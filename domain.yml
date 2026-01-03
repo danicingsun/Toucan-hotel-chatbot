@@ -214,6 +214,5 @@ responses:
 
 actions:
   - validate_booking_form
-  - booking_form
   - action_submit_booking_confirmed
   - action_cancel_booking
