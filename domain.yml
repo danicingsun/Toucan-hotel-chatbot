@@ -132,6 +132,23 @@ slots:
     mappings:
       - type: custom
 
+  confirmation: 
+    type: text 
+    influence_conversation: true 
+    mappings: 
+      - type: from_intent 
+        intent: affirm 
+        value: "yes" 
+        conditions: 
+          - active_loop: booking_form 
+            requested_slot: confirmation 
+      - type: from_intent 
+        intent: deny 
+        value: "no" 
+        conditions: 
+          - active_loop: booking_form 
+            requested_slot: confirmation
+
 forms:
   booking_form:
     required_slots:
@@ -143,6 +160,7 @@ forms:
       - breakfast
       - payment
       - refund
+      - confirmation
 
 responses:
   utter_greet:
@@ -187,7 +205,7 @@ responses:
         - title: "Non-refundable"
           payload: "non-refundable"
 
-  utter_summary:
+  utter_ask_confirmation:
     - text: |
         Here is your booking summary:
         • Name: {name}

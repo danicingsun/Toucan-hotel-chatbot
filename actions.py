@@ -125,12 +125,6 @@ class ValidateBookingForm(FormValidationAction):
         return {"payment": None}
 
     def validate_refund(self, value, dispatcher, tracker, domain):
-        # DEBUG: Print incoming info
-        dispatcher.utter_message(f"=== REFUND VALIDATOR ===")
-        dispatcher.utter_message(f"Value: {value}")
-        dispatcher.utter_message(f"Requested slot: {tracker.get_slot('requested_slot')}")
-        active_loop = tracker.active_loop.get("name") if tracker.active_loop else None
-        dispatcher.utter_message(f"Active loop: {active_loop}")
         norm = normalize_text(value)
         if norm in {"refundable", "non-refundable", "nonrefundable"}:
             dispatcher.utter_message(f"Refund policy set to {norm}.")
@@ -139,9 +133,22 @@ class ValidateBookingForm(FormValidationAction):
         dispatcher.utter_message("Please choose refundable or non-refundable.")
         return {"refund": None}
 
+    def validate_confirmation(self, value, dispatcher, tracker, domain): 
+        if value == "yes": 
+            return {"confirmation": "yes"} 
+        if value == "no": 
+            return {"confirmation": "no"}
+        dispatcher.utter_message("Please confirm with yes or no.") 
+        return {"confirmation": None}
+
     def submit(self, dispatcher, tracker, domain):
-        dispatcher.utter_message(response="utter_summary")
-        return [SlotSet("booking_ready", True)]
+        confirmation = tracker.get_slot("confirmation") 
+        if confirmation == "yes": 
+            dispatcher.utter_message("Your booking is confirmed! 🎉") 
+            return [SlotSet("booking_ready", True)] + [ SlotSet(slot, None) for slot in tracker.slots if slot != "booking_ready" ]
+
+        dispatcher.utter_message("Okay, I’ve cancelled the booking.") 
+        return [SlotSet(slot, None) for slot in tracker.slots]
 
 # ============================================================
 # CANCEL BOOKING
