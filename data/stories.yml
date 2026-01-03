@@ -8,18 +8,9 @@ stories:
     - action: utter_greet
     - intent: book_hotel
     - action: booking_form
+    - active_loop: booking_form
 
 - story: Confirm completed booking
   steps:
     - intent: affirm
     - action: action_submit_booking_confirmed
-
-- story: Cancel booking during form
-  steps:
-    - intent: book_hotel
-    - action: booking_form
-    - active_loop: booking_form
-    - intent: stop
-    - action: action_deactivate_loop
-    - action: action_cancel_booking
-    - active_loop: null

@@ -138,7 +138,7 @@ class ValidateBookingForm(FormValidationAction):
         dispatcher.utter_message("Please choose refundable or non-refundable.")
         return {"refund": None}
 
-     def submit(self, dispatcher, tracker, domain):
+    def submit(self, dispatcher, tracker, domain):
         dispatcher.utter_message(response="utter_summary")
         return [SlotSet("booking_ready", True)]
 
@@ -152,22 +152,23 @@ class ActionCancelBooking(Action):
     def run(self, dispatcher, tracker, domain):
         booking_ready = tracker.get_slot("booking_ready")
 
-        if not booking_ready:
+        if booking_ready:
             dispatcher.utter_message(
-                "There is no active booking to cancel."
+                "Your booking has been cancelled. All details were cleared."
             )
-            return []
-
-        dispatcher.utter_message(
-            "Your booking has been cancelled. All details were cleared."
-        )
+        else:
+            dispatcher.utter_message(
+                "Okay, I’ve cancelled the booking process."
+            )
 
         slots_to_reset = [
             "booking_ready", "name", "checkin", "checkout", "guests",
             "room_type", "breakfast", "payment", "refund", "requested_slot"
         ]
 
-        return [SlotSet(slot, None) for slot in slots_to_reset] + [ActiveLoop(None)]
+        return [SlotSet(slot, None) for slot in slots_to_reset] + [
+            ActiveLoop(None)
+        ]
 
 # ============================================================
 # CONFIRM BOOKING
