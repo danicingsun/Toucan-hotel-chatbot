@@ -125,13 +125,6 @@ slots:
           - active_loop: booking_form
             requested_slot: refund
 
-  # Control slot for two step confirmation
-  booking_ready:
-    type: bool
-    influence_conversation: true
-    mappings:
-      - type: custom
-
   confirmation: 
     type: text 
     influence_conversation: true 
@@ -166,22 +159,22 @@ responses:
   utter_greet:
     - text: "Hello! How can I help you today?"
 
-  utter_ask_name:
+  utter_ask_booking_form_name:
     - text: "What is the guest name for the booking?"
 
-  utter_ask_checkin:
+  utter_ask_booking_form_checkin:
     - text: "It's nice to chat with you {name}. What is your check-in date? (YYYY-MM-DD)"
 
-  utter_ask_checkout:
+  utter_ask_booking_form_checkout:
     - text: "What is your check-out date? (YYYY-MM-DD)"
 
-  utter_ask_guests:
+  utter_ask_booking_form_guests:
     - text: "How many guests will be staying?"
 
-  utter_ask_room_type:
+  utter_ask_booking_form_room_type:
     - text: "What type of room would you prefer {name}? (single, double, triple, suite)"
 
-  utter_ask_breakfast:
+  utter_ask_booking_form_breakfast:
     - text: "Would you like breakfast included {name}? (yes/no)"
       buttons:
         - title: "✅ YES"
@@ -189,7 +182,7 @@ responses:
         - title: "❌ NO"
           payload: "no"
 
-  utter_ask_payment:
+  utter_ask_booking_form_payment:
     - text: "What payment method do you prefer {name}? (credit card / cash)"
       buttons:
         - title: "Credit card"
@@ -197,7 +190,7 @@ responses:
         - title: "Cash"
           payload: "cash"
 
-  utter_ask_refund:
+  utter_ask_booking_form_refund:
     - text: "Do you prefer a refundable or non-refundable rate?"
       buttons:
         - title: "Refundable"
@@ -205,7 +198,7 @@ responses:
         - title: "Non-refundable"
           payload: "non-refundable"
 
-  utter_ask_confirmation:
+  utter_ask_booking_form_confirmation:
     - text: |
         Here is your booking summary:
         • Name: {name}

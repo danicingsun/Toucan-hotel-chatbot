@@ -131,15 +131,6 @@ class ValidateBookingForm(FormValidationAction):
         dispatcher.utter_message("Please confirm with yes or no.") 
         return {"confirmation": None}
 
-    def submit(self, dispatcher, tracker, domain):
-        confirmation = tracker.get_slot("confirmation") 
-        if confirmation == "yes": 
-            dispatcher.utter_message("Your booking is confirmed! 🎉") 
-            return [SlotSet("booking_ready", True)] + [ SlotSet(slot, None) for slot in tracker.slots if slot != "booking_ready" ]
-
-        dispatcher.utter_message("Okay, I’ve cancelled the booking.") 
-        return [SlotSet(slot, None) for slot in tracker.slots]
-
 # ============================================================
 # CANCEL BOOKING
 # ============================================================
@@ -148,25 +139,15 @@ class ActionCancelBooking(Action):
         return "action_cancel_booking"
 
     def run(self, dispatcher, tracker, domain):
-        booking_ready = tracker.get_slot("booking_ready")
-
-        if booking_ready:
-            dispatcher.utter_message(
-                "Your booking has been cancelled. All details were cleared."
-            )
-        else:
-            dispatcher.utter_message(
-                "Okay, I’ve cancelled the booking process."
-            )
-
+        dispatcher.utter_message("Your booking has been cancelled. All details were cleared.")
         slots_to_reset = [
-            "booking_ready", "name", "checkin", "checkout", "guests",
-            "room_type", "breakfast", "payment", "refund", "requested_slot"
+            "name", "checkin", "checkout", "guests",
+            "room_type", "breakfast", "payment",
+            "refund", "confirmation", "requested_slot"
         ]
 
-        return [SlotSet(slot, None) for slot in slots_to_reset] + [
-            ActiveLoop(None)
-        ]
+        return [SlotSet(slot, None) for slot in slots_to_reset] + [ActiveLoop(None)]
+
 
 # ============================================================
 # CONFIRM BOOKING
@@ -176,13 +157,11 @@ class ActionSubmitBookingConfirmed(Action):
         return "action_submit_booking_confirmed"
 
     def run(self, dispatcher, tracker, domain):
-        booking_ready = tracker.get_slot("booking_ready")
+        confirmation = tracker.get_slot("confirmation")
 
-        if not booking_ready:
-            dispatcher.utter_message(
-                "There is no completed booking to confirm yet."
-            )
-            return []
+        if confirmation != "yes":
+            dispatcher.utter_message("Your booking has been cancelled. All details were cleared.")
+            return [SlotSet(slot, None) for slot in tracker.slots] + [ActiveLoop(None)]
 
         name = tracker.get_slot("name")
 
@@ -193,8 +172,8 @@ class ActionSubmitBookingConfirmed(Action):
         )
 
         reset_slots = [
-            "booking_ready", "name", "checkin", "checkout", "guests",
-            "room_type", "breakfast", "payment", "refund", "requested_slot"
+            "name", "checkin", "checkout", "guests",
+            "room_type", "breakfast", "payment", "refund", "confirmation", "requested_slot"
         ]
 
         return [SlotSet(slot, None) for slot in reset_slots] + [ActiveLoop(None)]

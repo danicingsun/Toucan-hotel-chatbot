@@ -3,7 +3,8 @@ version: "3.1"
 rules:
 
 # -------------------------------------------------- 
-# Activate booking form # --------------------------------------------------
+# Activate booking form 
+# --------------------------------------------------
 - rule: Activate booking form
   steps:
     - intent: book_hotel
@@ -11,21 +12,20 @@ rules:
     - active_loop: booking_form
 
 # -------------------------------------------------- 
-# Continue form 
+# Submit form 
 # -------------------------------------------------- 
-- rule: Continue booking form 
+- rule: Submit booking form 
   condition: 
     - active_loop: booking_form 
   steps: 
     - action: booking_form
+    - active_loop: null
+    - action: action_submit_booking_confirmed
 
-# --------------------------------------------------
-# Cancel booking while form is active
-# --------------------------------------------------
-- rule: Cancel booking while form is active
+
+- rule: Cancel booking during form
   condition:
     - active_loop: booking_form
   steps:
     - intent: stop
-    - action: action_deactivate_loop
     - action: action_cancel_booking
