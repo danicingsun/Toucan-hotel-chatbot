@@ -203,9 +203,10 @@ class ActionHandleBookingChange(Action):
 
         if not field or field not in slot_map:
             dispatcher.utter_message(
-                "Sure — what would you like to change? For example, the name, the dates, room type, number of guests, payment method, refund option or breakfast option."
+                "Sure — what would you like to change?" 
+                "For example: name, dates, room type, guests, payment, refund or breakfast."
             )
-            return []
+            return [ActiveLoop(None)]
 
         slot_to_reset = slot_map[field]
 
