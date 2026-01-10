@@ -143,10 +143,15 @@ class ActionCancelBooking(Action):
         slots_to_reset = [
             "name", "checkin", "checkout", "guests",
             "room_type", "breakfast", "payment",
-            "refund", "confirmation", "requested_slot"
+            "refund", "confirmation", "booking_field"
         ]
 
-        return [SlotSet(slot, None) for slot in slots_to_reset] + [ActiveLoop(None)]
+        events = [SlotSet(slot, None) for slot in slots_to_reset]
+
+        events.append(SlotSet("requested_slot", None))
+        events.append(ActiveLoop(None))
+
+        return events
 
 
 # ============================================================
