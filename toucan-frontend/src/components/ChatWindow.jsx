@@ -30,7 +30,7 @@ export default function ChatWindow() {
   const senderId = getSenderId();
 
   const [messages, setMessages] = useState([
-    { from: "bot", text: " Toucan: Hello — would you like help booking a room today?" }
+    { from: "bot", text: " Hello! My name is Toucan. I can help you with booking a room if you want." }
   ]);
   const [input, setInput] = useState("");
   const [buttons, setButtons] = useState([]);

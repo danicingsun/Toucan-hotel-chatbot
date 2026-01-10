@@ -6,6 +6,7 @@ intents:
   - stop
   - affirm
   - deny
+  - change_booking
 
 entities:
   - name
@@ -16,6 +17,7 @@ entities:
   - breakfast
   - payment
   - refund
+  - booking_field
 
 slots:
   name:
@@ -227,3 +229,4 @@ actions:
   - validate_booking_form
   - action_submit_booking_confirmed
   - action_cancel_booking
+  - action_handle_booking_change

@@ -177,3 +177,44 @@ class ActionSubmitBookingConfirmed(Action):
         ]
 
         return [SlotSet(slot, None) for slot in reset_slots] + [ActiveLoop(None)]
+
+
+# ============================================================
+# CHANGE BOOKING
+# ============================================================
+class ActionHandleBookingChange(Action):
+    def name(self):
+        return "action_handle_booking_change"
+
+    def run(self, dispatcher, tracker, domain):
+
+        field = tracker.get_slot("booking_field")
+
+        slot_map = {
+            "name": "name",
+            "checkin": "checkin",
+            "checkout": "checkout",
+            "guests": "guests",
+            "room_type": "room_type",
+            "breakfast": "breakfast",
+            "payment": "payment",
+            "refund": "refund"
+        }
+
+        if not field or field not in slot_map:
+            dispatcher.utter_message(
+                "Sure — what would you like to change? For example, the name, the dates, room type, number of guests, payment method, refund option or breakfast option."
+            )
+            return []
+
+        slot_to_reset = slot_map[field]
+
+        dispatcher.utter_message(
+            f"No problem. Let’s update your {field.replace('_', ' ')}."
+        )
+
+        return [
+            SlotSet(slot_to_reset, None),
+            SlotSet("confirmation", None),
+            ActiveLoop("booking_form")
+        ]

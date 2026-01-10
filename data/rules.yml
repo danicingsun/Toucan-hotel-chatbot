@@ -22,10 +22,32 @@ rules:
     - active_loop: null
     - action: action_submit_booking_confirmed
 
-
+# -------------------------------------------------- 
+# Cancel form 
+# --------------------------------------------------
 - rule: Cancel booking during form
   condition:
     - active_loop: booking_form
   steps:
     - intent: stop
     - action: action_cancel_booking
+
+# --------------------------------------------------
+# Change booking DURING form
+# --------------------------------------------------
+- rule: Change booking during form
+  condition:
+    - active_loop: booking_form
+  steps:
+    - intent: change_booking
+    - action: action_handle_booking_change
+
+# --------------------------------------------------
+# Change booking AFTER form
+# --------------------------------------------------
+- rule: Change booking after form
+  condition:
+    - active_loop: null
+  steps:
+    - intent: change_booking
+    - action: action_handle_booking_change
