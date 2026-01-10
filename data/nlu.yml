@@ -108,6 +108,19 @@ nlu:
     - not okay
     - I don’t agree
 
+- intent: select_booking_field
+  examples: |
+    - name
+    - guest name
+    - check in
+    - check out
+    - dates
+    - room type
+    - number of guests
+    - breakfast
+    - payment
+    - refund
+
 # ==================================================
 # GENERIC CHANGE REQUESTS (NO FIELD SPECIFIED)
 # ==================================================
@@ -216,7 +229,7 @@ nlu:
   examples: |
     - change the [refund](booking_field)
     - update the [refund](booking_field) policy
-    - make the booking [refund](booking_field)able
+    - make the booking [refund](booking_field) able
     - I want to modify the [refund](booking_field)
     - switch the [refund](booking_field) option
     - I want a different [refund](booking_field) policy

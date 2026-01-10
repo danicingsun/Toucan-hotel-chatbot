@@ -193,38 +193,42 @@ class ActionHandleBookingChange(Action):
 
     def run(self, dispatcher, tracker, domain):
 
-        field = tracker.get_slot("booking_field")
+        raw = tracker.get_slot("booking_field")
+        field = normalize_text(raw)
 
-        slot_map = {
+        field_aliases = {
             "name": "name",
+            "guest name": "name",
             "checkin": "checkin",
+            "check in": "checkin",
+            "check-in": "checkin",
             "checkout": "checkout",
+            "check out": "checkout",
+            "check-out": "checkout",
             "guests": "guests",
-            "room_type": "room_type",
+            "people": "guests",
+            "room": "room_type",
+            "room type": "room_type",
             "breakfast": "breakfast",
             "payment": "payment",
-            "refund": "refund"
+            "refund": "refund",
+            "dates": "checkin"
         }
 
-        if not field or field not in slot_map:
+        field = field_aliases.get(field)
+
+        if not field:
             dispatcher.utter_message(
-                "Sure — what would you like to change? " 
+                "Sure — what would you like to change? "
                 "For example: name, dates, room type, guests, payment, refund or breakfast."
             )
-            return [
-                SlotSet("requested_slot", None),
-                ActiveLoop(None)
-            ]
+            return [SlotSet("requested_slot", None)]
 
-        slot_to_reset = slot_map[field]
-
-        dispatcher.utter_message(
-            f"No problem. Let’s update your {field.replace('_', ' ')}."
-        )
+        dispatcher.utter_message(f"No problem. Let’s update your {field.replace('_', ' ')}.")
 
         return [
-            SlotSet("requested_slot", None),
-            SlotSet(slot_to_reset, None),
+            SlotSet(field, None),
             SlotSet("confirmation", None),
+            SlotSet("requested_slot", None),
             ActiveLoop("booking_form")
         ]

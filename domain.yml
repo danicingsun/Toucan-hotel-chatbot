@@ -7,6 +7,7 @@ intents:
   - affirm
   - deny
   - change_booking
+  - select_booking_field
 
 entities:
   - name
@@ -144,10 +145,18 @@ slots:
           - active_loop: booking_form 
             requested_slot: confirmation
 
+  booking_field:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_text
+        intent: select_booking_field
+
 forms:
   booking_form:
     ignored_intents:
       - change_booking
+      - select_booking_field
       - stop
     required_slots:
       - name

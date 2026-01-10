@@ -33,21 +33,17 @@ rules:
     - action: action_cancel_booking
 
 # --------------------------------------------------
-# Change booking DURING form
+# Ask what to change
 # --------------------------------------------------
-- rule: Change booking during form
-  condition:
-    - active_loop: booking_form
+- rule: Ask what to change
   steps:
     - intent: change_booking
     - action: action_handle_booking_change
 
 # --------------------------------------------------
-# Change booking AFTER form
+# Apply booking field change
 # --------------------------------------------------
 - rule: Change booking after form
-  condition:
-    - active_loop: null
   steps:
-    - intent: change_booking
+    - intent: select_booking_field
     - action: action_handle_booking_change
