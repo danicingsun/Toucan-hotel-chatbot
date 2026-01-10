@@ -8,7 +8,6 @@ rules:
 - rule: Activate booking form
   steps:
     - intent: book_hotel
-    - action: action_cancel_booking
     - action: booking_form
     - active_loop: booking_form
 
