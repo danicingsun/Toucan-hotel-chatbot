@@ -149,8 +149,8 @@ slots:
     type: text
     influence_conversation: true
     mappings:
-      - type: from_text
-        intent: select_booking_field
+      - type: from_entity
+        entity: booking_field
 
 forms:
   booking_form:

@@ -108,19 +108,6 @@ nlu:
     - not okay
     - I don’t agree
 
-- intent: select_booking_field
-  examples: |
-    - name
-    - guest name
-    - check in
-    - check out
-    - dates
-    - room type
-    - number of guests
-    - breakfast
-    - payment
-    - refund
-
 # ==================================================
 # GENERIC CHANGE REQUESTS (NO FIELD SPECIFIED)
 # ==================================================

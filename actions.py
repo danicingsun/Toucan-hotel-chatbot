@@ -1,6 +1,5 @@
 from datetime import datetime
 from rasa_sdk import Action, Tracker
-from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.forms import FormValidationAction
 from rasa_sdk.events import SlotSet, ActiveLoop
 
@@ -29,6 +28,17 @@ class ValidateBookingForm(FormValidationAction):
     def name(self) -> str:
         return "validate_booking_form"
 
+    # Generic validate function to check for intent first
+    def validate(self, dispatcher, tracker, domain):
+        intent = tracker.latest_message.get("intent", {}).get("name")
+
+        # Only short-circuit when changing booking
+        if intent == "change_booking":
+            return {}
+
+        return super().validate(dispatcher, tracker, domain)
+
+
     # --------------------------
     # Slot validators
     # --------------------------
@@ -52,7 +62,7 @@ class ValidateBookingForm(FormValidationAction):
             dispatcher.utter_message("Please use YYYY-MM-DD format.")
             return {"checkin": None}
 
-    def validate_checkout(self, value, dispatcher, tracker, domain):
+    def validate_checkout(self, value, dispatcher, tracker, domain): 
         if not value:
             unclear_value(dispatcher)
             return {"checkout": None}
@@ -228,7 +238,7 @@ class ActionHandleBookingChange(Action):
 
         return [
             SlotSet(field, None),
-            SlotSet("confirmation", None),
             SlotSet("requested_slot", None),
+            SlotSet("confirmation", None),
             ActiveLoop("booking_form")
         ]
