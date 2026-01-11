@@ -1,6 +1,7 @@
 from datetime import datetime
 from rasa_sdk import Action, Tracker
 from rasa_sdk.forms import FormValidationAction
+from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.events import SlotSet, ActiveLoop
 
 # ============================================================
@@ -198,47 +199,47 @@ class ActionSubmitBookingConfirmed(Action):
 # CHANGE BOOKING
 # ============================================================
 class ActionHandleBookingChange(Action):
-    def name(self):
+
+    def name(self) -> str:
         return "action_handle_booking_change"
 
-    def run(self, dispatcher, tracker, domain):
+    def run(
+        self,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: dict,
+    ):
+        booking_field = tracker.get_slot("booking_field")
 
-        raw = tracker.get_slot("booking_field")
-        field = normalize_text(raw)
+        if not booking_field:
+            dispatcher.utter_message(
+                "What would you like to change? For example: name, dates, room type, guests, payment, refund or breakfast."
+            )
+            return []
 
-        field_aliases = {
-            "name": "name",
-            "guest name": "name",
+        # Map booking_field → actual slot name
+        slot_mapping = {
             "checkin": "checkin",
-            "check in": "checkin",
-            "check-in": "checkin",
             "checkout": "checkout",
-            "check out": "checkout",
-            "check-out": "checkout",
+            "name": "name",
             "guests": "guests",
-            "people": "guests",
             "room": "room_type",
-            "room type": "room_type",
             "breakfast": "breakfast",
             "payment": "payment",
             "refund": "refund",
-            "dates": "checkin"
         }
 
-        field = field_aliases.get(field)
+        slot_to_reset = slot_mapping.get(booking_field)
 
-        if not field:
+        if slot_to_reset:
             dispatcher.utter_message(
-                "Sure — what would you like to change? "
-                "For example: name, dates, room type, guests, payment, refund or breakfast."
+                f"Okay, let's update your {slot_to_reset}. What is the new value?"
             )
-            return [SlotSet("requested_slot", None)]
+            return [
+                SlotSet(slot_to_reset, None),     # clear old value
+                SlotSet("requested_slot", slot_to_reset),
+                SlotSet("booking_field", None),   # important to avoid loops
+            ]
 
-        dispatcher.utter_message(f"No problem. Let’s update your {field.replace('_', ' ')}.")
-
-        return [
-            SlotSet(field, None),
-            SlotSet("requested_slot", None),
-            SlotSet("confirmation", None),
-            ActiveLoop("booking_form")
-        ]
+        dispatcher.utter_message("I’m not sure how to change that yet.")
+        return []
