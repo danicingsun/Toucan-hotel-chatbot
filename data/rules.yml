@@ -36,14 +36,8 @@ rules:
 # Ask what to change
 # --------------------------------------------------
 - rule: Ask what to change
+  condition:
+    - active_loop: booking_form
   steps:
     - intent: change_booking
-    - action: action_handle_booking_change
-
-# --------------------------------------------------
-# Apply booking field change
-# --------------------------------------------------
-- rule: Change booking after form
-  steps:
-    - intent: select_booking_field
     - action: action_handle_booking_change

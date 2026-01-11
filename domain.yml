@@ -7,7 +7,6 @@ intents:
   - affirm
   - deny
   - change_booking
-  - select_booking_field
 
 entities:
   - name
@@ -156,7 +155,6 @@ forms:
   booking_form:
     ignored_intents:
       - change_booking
-      - select_booking_field
       - stop
     required_slots:
       - name
