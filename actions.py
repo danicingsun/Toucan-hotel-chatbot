@@ -29,15 +29,50 @@ class ValidateBookingForm(FormValidationAction):
     def name(self) -> str:
         return "validate_booking_form"
 
-    # Generic validate function to check for intent first
     def validate(self, dispatcher, tracker, domain):
         intent = tracker.latest_message.get("intent", {}).get("name")
+        booking_field = tracker.get_slot("booking_field")
 
-        # Only short-circuit when changing booking
-        if intent == "change_booking":
+        # --------------------------------------------------
+        # 1. Intercept booking changes FIRST
+        # --------------------------------------------------
+        if intent == "change_booking" or booking_field:
+            slot_map = {
+                "checkin": "checkin",
+                "checkout": "checkout",
+                "name": "name",
+                "guests": "guests",
+                "room": "room_type",
+                "room_type": "room_type",
+                "breakfast": "breakfast",
+                "payment": "payment",
+                "refund": "refund",
+            }
+
+            slot_to_reset = slot_map.get(booking_field)
+
+            if slot_to_reset:
+                dispatcher.utter_message(
+                    f"Okay, let's update your {slot_to_reset}. What is the new value?"
+                )
+
+                return {
+                    slot_to_reset: None,
+                    "requested_slot": slot_to_reset,
+                    "booking_field": None,
+                }
+
+            # If user said "I want to change something" but didn't specify
+            dispatcher.utter_message(
+                "What would you like to change? For example: name, dates, room type, guests, payment, refund or breakfast."
+            )
             return {}
 
+        # --------------------------------------------------
+        # 2. Normal form validation
+        # --------------------------------------------------
         return super().validate(dispatcher, tracker, domain)
+
 
 
     # --------------------------
@@ -203,12 +238,7 @@ class ActionHandleBookingChange(Action):
     def name(self) -> str:
         return "action_handle_booking_change"
 
-    def run(
-        self,
-        dispatcher: CollectingDispatcher,
-        tracker: Tracker,
-        domain: dict,
-    ):
+    def run(self, dispatcher, tracker, domain):
         booking_field = tracker.get_slot("booking_field")
 
         if not booking_field:
@@ -217,29 +247,4 @@ class ActionHandleBookingChange(Action):
             )
             return []
 
-        # Map booking_field → actual slot name
-        slot_mapping = {
-            "checkin": "checkin",
-            "checkout": "checkout",
-            "name": "name",
-            "guests": "guests",
-            "room": "room_type",
-            "breakfast": "breakfast",
-            "payment": "payment",
-            "refund": "refund",
-        }
-
-        slot_to_reset = slot_mapping.get(booking_field)
-
-        if slot_to_reset:
-            dispatcher.utter_message(
-                f"Okay, let's update your {slot_to_reset}. What is the new value?"
-            )
-            return [
-                SlotSet(slot_to_reset, None),     # clear old value
-                SlotSet("requested_slot", slot_to_reset),
-                SlotSet("booking_field", None),   # important to avoid loops
-            ]
-
-        dispatcher.utter_message("I’m not sure how to change that yet.")
         return []
