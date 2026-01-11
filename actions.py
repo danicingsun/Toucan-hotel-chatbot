@@ -31,24 +31,28 @@ class ValidateBookingForm(FormValidationAction):
 
     def validate(self, dispatcher, tracker, domain):
         intent = tracker.latest_message.get("intent", {}).get("name")
-       
-        # --------------------------------------------------
-        # 1. Intercept booking changes FIRST
-        # --------------------------------------------------
+        text = tracker.latest_message.get("text", "").lower()
 
-        booking_field = None
-        entities = tracker.latest_message.get("entities", [])
-        for ent in entities:
-            if ent.get("entity") == "booking_field":
-                booking_field = ent.get("value")
-                break
+        # --------------------------------------------------
+        # 1. Intercept booking changes
+        # --------------------------------------------------
+        if intent == "change_booking":
+            # Try to get entity first
+            booking_field = None
+            entities = tracker.latest_message.get("entities", [])
+            for ent in entities:
+                if ent.get("entity") == "booking_field":
+                    booking_field = ent.get("value")
+                    break
 
-        if intent == "change_booking" and booking_field:
-            # map common terms to slot names
+            # Map user terms to slot names
             slot_map = {
                 "name": "name",
+                "guest": "name",
                 "checkin": "checkin",
+                "check-in": "checkin",
                 "checkout": "checkout",
+                "check-out": "checkout",
                 "guests": "guests",
                 "room": "room_type",
                 "room_type": "room_type",
@@ -56,24 +60,37 @@ class ValidateBookingForm(FormValidationAction):
                 "payment": "payment",
                 "refund": "refund"
             }
-            slot_to_reset = slot_map.get(booking_field)
-            if slot_to_reset:
-                dispatcher.utter_message(f"Okay, let's update your {slot_to_reset}. What is the new value?")
+
+            slot_to_change = None
+
+            # Priority 1: entity
+            if booking_field:
+                slot_to_change = slot_map.get(booking_field.lower())
+
+            # Priority 2: detect keyword in text
+            if not slot_to_change:
+                for key, slot in slot_map.items():
+                    if key in text:
+                        slot_to_change = slot
+                        break
+
+            if slot_to_change:
+                dispatcher.utter_message(f"Okay, let's update your {slot_to_change}. What is the new value?")
                 return [
-                    SlotSet(slot_to_reset, None),
-                    SlotSet("requested_slot", slot_to_reset)
+                    SlotSet(slot_to_change, None),
+                    SlotSet("requested_slot", slot_to_change)
                 ]
-            else:
-                dispatcher.utter_message(f"I don't know how to change '{booking_field}' yet.")
-                return {}
 
-        # --- otherwise, continue normal slot validation ---
-        return super().validate(dispatcher, tracker, domain)
-        # --------------------------------------------------
-        # 2. Normal form validation
-        # --------------------------------------------------
-        return super().validate(dispatcher, tracker, domain)
+            # fallback: ask user what to change
+            dispatcher.utter_message(
+                "Which part of your booking would you like to change? Name, dates, room type, guests, breakfast, payment, or refund?"
+            )
+            return [SlotSet("requested_slot", None)]
 
+        # --------------------------------------------------
+        # 2. Otherwise, continue normal slot validation
+        # --------------------------------------------------
+        return super().validate(dispatcher, tracker, domain)
 
 
     # --------------------------
