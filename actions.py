@@ -31,43 +31,44 @@ class ValidateBookingForm(FormValidationAction):
 
     def validate(self, dispatcher, tracker, domain):
         intent = tracker.latest_message.get("intent", {}).get("name")
-        booking_field = tracker.get_slot("booking_field")
-
+       
         # --------------------------------------------------
         # 1. Intercept booking changes FIRST
         # --------------------------------------------------
-        if intent == "change_booking" or booking_field:
+
+        booking_field = None
+        entities = tracker.latest_message.get("entities", [])
+        for ent in entities:
+            if ent.get("entity") == "booking_field":
+                booking_field = ent.get("value")
+                break
+
+        if intent == "change_booking" and booking_field:
+            # map common terms to slot names
             slot_map = {
+                "name": "name",
                 "checkin": "checkin",
                 "checkout": "checkout",
-                "name": "name",
                 "guests": "guests",
                 "room": "room_type",
                 "room_type": "room_type",
                 "breakfast": "breakfast",
                 "payment": "payment",
-                "refund": "refund",
+                "refund": "refund"
             }
-
             slot_to_reset = slot_map.get(booking_field)
-
             if slot_to_reset:
-                dispatcher.utter_message(
-                    f"Okay, let's update your {slot_to_reset}. What is the new value?"
-                )
+                dispatcher.utter_message(f"Okay, let's update your {slot_to_reset}. What is the new value?")
+                return [
+                    SlotSet(slot_to_reset, None),
+                    SlotSet("requested_slot", slot_to_reset)
+                ]
+            else:
+                dispatcher.utter_message(f"I don't know how to change '{booking_field}' yet.")
+                return {}
 
-                return {
-                    slot_to_reset: None,
-                    "requested_slot": slot_to_reset,
-                    "booking_field": None,
-                }
-
-            # If user said "I want to change something" but didn't specify
-            dispatcher.utter_message(
-                "What would you like to change? For example: name, dates, room type, guests, payment, refund or breakfast."
-            )
-            return {}
-
+        # --- otherwise, continue normal slot validation ---
+        return super().validate(dispatcher, tracker, domain)
         # --------------------------------------------------
         # 2. Normal form validation
         # --------------------------------------------------
