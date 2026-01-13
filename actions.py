@@ -30,59 +30,18 @@ class ValidateBookingForm(FormValidationAction):
         return "validate_booking_form"
 
     def validate(self, dispatcher, tracker, domain):
-        text = tracker.latest_message.get("text", "").lower()
+        # --- Pattern 1: change mid-form ---
+        booking_field = tracker.get_slot("booking_field")
+        if booking_field:
+            dispatcher.utter_message(f"Okay, let's update your {booking_field}. What is the new value?")
+            return [
+                SlotSet(booking_field, None),
+                SlotSet("requested_slot", booking_field),
+                SlotSet("booking_field", None)
+            ]
 
-        CHANGE_TRIGGERS = {
-            "change", "modify", "update", "edit", "correct"
-        }
-
-        SLOT_KEYWORDS = {
-            "name": "name",
-            "guest": "name",
-            "checkin": "checkin",
-            "check-in": "checkin",
-            "checkout": "checkout",
-            "check-out": "checkout",
-            "date": None,  # ambiguous → ask follow-up
-            "guests": "guests",
-            "room": "room_type",
-            "breakfast": "breakfast",
-            "payment": "payment",
-            "refund": "refund"
-        }
- 
-      # --------------------------------------------------
-      # 1. HARD INTERRUPT: detect change request
-      # --------------------------------------------------
-        if any(trigger in text for trigger in CHANGE_TRIGGERS):
-            slot_to_change = None
-
-            for key, slot in SLOT_KEYWORDS.items():
-                if key in text:
-                    slot_to_change = slot
-                    break
-
-            if slot_to_change:
-                dispatcher.utter_message(
-                    f"Okay, let's update your {slot_to_change}. What is the new value?"
-                )
-                return [
-                    SlotSet(slot_to_change, None),        # clear slot
-                    SlotSet("requested_slot", slot_to_change)
-                ]
-
-            dispatcher.utter_message(
-                "Sure — what would you like to change? "
-                "You can say: name, dates, room type, guests, breakfast, payment or refund."
-            )
-            return [SlotSet("requested_slot", None)]
-
-
-        # --------------------------------------------------
-        # 2. Otherwise, continue normal slot validation
-        # --------------------------------------------------
+        # Otherwise, continue normal validation
         return super().validate(dispatcher, tracker, domain)
-
 
     # --------------------------
     # Slot validators
