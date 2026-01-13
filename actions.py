@@ -62,23 +62,20 @@ class ValidateBookingForm(FormValidationAction):
                     slot_to_change = slot
                     break
 
-            # Fully stop the form
-            events = [ActiveLoop(None)]
-
             if slot_to_change:
                 dispatcher.utter_message(
                     f"Okay, let's update your {slot_to_change}. What is the new value?"
                 )
-                events.append(SlotSet(slot_to_change, None))
-                events.append(SlotSet("requested_slot", slot_to_change))
+                return [
+                    SlotSet(slot_to_change, None),        # clear slot
+                    SlotSet("requested_slot", slot_to_change)
+                ]
 
             dispatcher.utter_message(
                 "Sure — what would you like to change? "
                 "You can say: name, dates, room type, guests, breakfast, payment or refund."
             )
-            events.append(SlotSet("requested_slot", None))
-        
-        return events
+            return []
 
 
         # --------------------------------------------------

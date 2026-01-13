@@ -31,14 +31,3 @@ rules:
   steps:
     - intent: stop
     - action: action_cancel_booking
-
-# --------------------------------------------------
-# Handle booking changes during form
-# --------------------------------------------------
-- rule: Handle booking changes during form
-  condition:
-    - active_loop: booking_form
-  steps:
-    - intent: change_booking
-    - action: booking_form
-    - active_loop: booking_form

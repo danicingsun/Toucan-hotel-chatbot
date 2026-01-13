@@ -110,9 +110,6 @@ nlu:
     - not okay
     - I don’t agree
 
-# ==================================================
-# GENERIC CHANGE REQUESTS (NO FIELD SPECIFIED)
-# ==================================================
 - intent: change_booking
   examples: |
     - I want to change my booking
@@ -123,16 +120,10 @@ nlu:
     - I made a mistake in my booking
     - I want to adjust the booking
     - I need to make a change
-# ==================================================
-# NAME
-# ==================================================
     - change the [name](booking_field)
     - update the guest [name](booking_field)
     - the [name](booking_field) is wrong
     - I want to change the booking [name](booking_field)
-# ==================================================
-# CHECK-IN DATE
-# ==================================================
     - change the [checkin](booking_field)
     - update the [checkin](booking_field) date
     - I want to change my [checkin](booking_field)
@@ -141,9 +132,6 @@ nlu:
     - I need a different [checkin](booking_field)
     - move my [checkin](booking_field)
     - adjust the [checkin](booking_field)
-# ==================================================
-# CHECK-OUT DATE
-# ==================================================
     - change the [checkout](booking_field)
     - update the [checkout](booking_field) date
     - I want to change my [checkout](booking_field)
@@ -151,9 +139,6 @@ nlu:
     - the [checkout](booking_field) date is incorrect
     - I want to leave later, change the [checkout](booking_field)
     - shorten my stay by changing the [checkout](booking_field)
-# ==================================================
-# NUMBER OF GUESTS
-# ==================================================
     - change the number of [guests](booking_field)
     - update the [guests](booking_field)
     - I want to modify the [guests](booking_field)
@@ -161,9 +146,6 @@ nlu:
     - reduce the number of [guests](booking_field)
     - add another [guests](booking_field)
     - the [guests](booking_field) count is wrong
-# ==================================================
-# ROOM TYPE
-# ==================================================
     - change the [room_type](booking_field)
     - I want a different [room_type](booking_field)
     - update the [room_type](booking_field)
@@ -171,28 +153,18 @@ nlu:
     - modify the [room_type](booking_field)
     - I want to change to another [room_type](booking_field)
     - the selected [room_type](booking_field) is not correct
-# ==================================================
-# BREAKFAST
-# ==================================================
     - change the [breakfast](booking_field)
     - update the [breakfast](booking_field) option
     - I want to add [breakfast](booking_field)
     - remove the [breakfast](booking_field)
     - modify the [breakfast](booking_field)
     - I no longer want [breakfast](booking_field)
-# ==================================================
-# PAYMENT METHOD
-# ==================================================
     - change the [payment](booking_field)
     - update the [payment](booking_field) method
     - I want to modify the [payment](booking_field)
     - switch the [payment](booking_field)
     - change how I [payment](booking_field)
     - update my [payment](booking_field) choice
-
-# ==================================================
-# REFUND POLICY
-# ==================================================
     - change the [refund](booking_field)
     - update the [refund](booking_field) policy
     - make the booking [refund](booking_field) able
@@ -204,8 +176,8 @@ nlu:
     - sorry, I meant the [room_type](booking_field)
     - no, change the [checkout](booking_field)
 
-lookup: booking_field 
-  examples: | 
+lookup: booking_field
+examples: | 
     - name 
     - checkin
     - checkout 
