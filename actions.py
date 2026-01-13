@@ -30,62 +30,54 @@ class ValidateBookingForm(FormValidationAction):
         return "validate_booking_form"
 
     def validate(self, dispatcher, tracker, domain):
-        intent = tracker.latest_message.get("intent", {}).get("name")
         text = tracker.latest_message.get("text", "").lower()
 
-        # --------------------------------------------------
-        # 1. Intercept booking changes
-        # --------------------------------------------------
-        if intent == "change_booking":
-            # Try to get entity first
-            booking_field = None
-            entities = tracker.latest_message.get("entities", [])
-            for ent in entities:
-                if ent.get("entity") == "booking_field":
-                    booking_field = ent.get("value")
-                    break
+        CHANGE_TRIGGERS = {
+            "change", "modify", "update", "edit", "correct"
+        }
 
-            # Map user terms to slot names
-            slot_map = {
-                "name": "name",
-                "guest": "name",
-                "checkin": "checkin",
-                "check-in": "checkin",
-                "checkout": "checkout",
-                "check-out": "checkout",
-                "guests": "guests",
-                "room": "room_type",
-                "room_type": "room_type",
-                "breakfast": "breakfast",
-                "payment": "payment",
-                "refund": "refund"
-            }
-
+        SLOT_KEYWORDS = {
+            "name": "name",
+            "guest": "name",
+            "checkin": "checkin",
+            "check-in": "checkin",
+            "checkout": "checkout",
+            "check-out": "checkout",
+            "date": None,  # ambiguous → ask follow-up
+            "guests": "guests",
+            "room": "room_type",
+            "breakfast": "breakfast",
+            "payment": "payment",
+            "refund": "refund"
+        }
+ 
+      # --------------------------------------------------
+      # 1. HARD INTERRUPT: detect change request
+      # --------------------------------------------------
+        if any(trigger in text for trigger in CHANGE_TRIGGERS):
             slot_to_change = None
 
-            # Priority 1: entity
-            if booking_field:
-                slot_to_change = slot_map.get(booking_field.lower())
-
-            # Priority 2: detect keyword in text
-            if not slot_to_change:
-                for key, slot in slot_map.items():
-                    if key in text:
-                        slot_to_change = slot
-                        break
+            for key, slot in SLOT_KEYWORDS.items():
+                if key in text:
+                    slot_to_change = slot
+                    break
 
             if slot_to_change:
-                dispatcher.utter_message(f"Okay, let's update your {slot_to_change}. What is the new value?")
-                return [
-                    SlotSet(slot_to_change, None),
-                    SlotSet("requested_slot", slot_to_change)
-                ]
+                dispatcher.utter_message(
+                    f"Okay, let's update your {slot_to_change}. What is the new value?"
+                )
+                return {
+                   slot_to_change: None,
+                   "requested_slot": slot_to_change
+                }
 
-            # fallback: ask user what to change
             dispatcher.utter_message(
-                "Which part of your booking would you like to change? Name, dates, room type, guests, breakfast, payment, or refund?"
+                "Sure — what would you like to change? "
+                "You can say: name, dates, room type, guests, breakfast, payment or refund."
             )
-            return [SlotSet("requested_slot", None)]
+            return {
+                "requested_slot": None
+            }
 
         # --------------------------------------------------
         # 2. Otherwise, continue normal slot validation

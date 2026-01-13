@@ -42,6 +42,8 @@ nlu:
     - I need to reserve a place to stay
     - Please book a hotel for me
     - I want to book lodging
+    - I want to book, not change anything 
+    - I want to make a new booking
 
 - intent: stop
   examples: |
@@ -121,22 +123,16 @@ nlu:
     - I made a mistake in my booking
     - I want to adjust the booking
     - I need to make a change
-
 # ==================================================
 # NAME
 # ==================================================
-- intent: change_booking
-  examples: |
     - change the [name](booking_field)
     - update the guest [name](booking_field)
     - the [name](booking_field) is wrong
     - I want to change the booking [name](booking_field)
-
 # ==================================================
 # CHECK-IN DATE
 # ==================================================
-- intent: change_booking
-  examples: |
     - change the [checkin](booking_field)
     - update the [checkin](booking_field) date
     - I want to change my [checkin](booking_field)
@@ -145,12 +141,9 @@ nlu:
     - I need a different [checkin](booking_field)
     - move my [checkin](booking_field)
     - adjust the [checkin](booking_field)
-
 # ==================================================
 # CHECK-OUT DATE
 # ==================================================
-- intent: change_booking
-  examples: |
     - change the [checkout](booking_field)
     - update the [checkout](booking_field) date
     - I want to change my [checkout](booking_field)
@@ -158,12 +151,9 @@ nlu:
     - the [checkout](booking_field) date is incorrect
     - I want to leave later, change the [checkout](booking_field)
     - shorten my stay by changing the [checkout](booking_field)
-
 # ==================================================
 # NUMBER OF GUESTS
 # ==================================================
-- intent: change_booking
-  examples: |
     - change the number of [guests](booking_field)
     - update the [guests](booking_field)
     - I want to modify the [guests](booking_field)
@@ -171,12 +161,9 @@ nlu:
     - reduce the number of [guests](booking_field)
     - add another [guests](booking_field)
     - the [guests](booking_field) count is wrong
-
 # ==================================================
 # ROOM TYPE
 # ==================================================
-- intent: change_booking
-  examples: |
     - change the [room_type](booking_field)
     - I want a different [room_type](booking_field)
     - update the [room_type](booking_field)
@@ -184,24 +171,18 @@ nlu:
     - modify the [room_type](booking_field)
     - I want to change to another [room_type](booking_field)
     - the selected [room_type](booking_field) is not correct
-
 # ==================================================
 # BREAKFAST
 # ==================================================
-- intent: change_booking
-  examples: |
     - change the [breakfast](booking_field)
     - update the [breakfast](booking_field) option
     - I want to add [breakfast](booking_field)
     - remove the [breakfast](booking_field)
     - modify the [breakfast](booking_field)
     - I no longer want [breakfast](booking_field)
-
 # ==================================================
 # PAYMENT METHOD
 # ==================================================
-- intent: change_booking
-  examples: |
     - change the [payment](booking_field)
     - update the [payment](booking_field) method
     - I want to modify the [payment](booking_field)
@@ -212,11 +193,24 @@ nlu:
 # ==================================================
 # REFUND POLICY
 # ==================================================
-- intent: change_booking
-  examples: |
     - change the [refund](booking_field)
     - update the [refund](booking_field) policy
     - make the booking [refund](booking_field) able
     - I want to modify the [refund](booking_field)
     - switch the [refund](booking_field) option
     - I want a different [refund](booking_field) policy
+    - oh wait, the [guests](booking_field) is wrong
+    - actually change the [checkin](booking_field)
+    - sorry, I meant the [room_type](booking_field)
+    - no, change the [checkout](booking_field)
+
+lookup: booking_field 
+  examples: | 
+    - name 
+    - checkin
+    - checkout 
+    - guests 
+    - room_type 
+    - breakfast 
+    - payment 
+    - refund
