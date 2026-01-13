@@ -31,3 +31,8 @@ rules:
   steps:
     - intent: stop
     - action: action_cancel_booking
+
+- rule: Resume booking form after change
+  steps:
+    - action: booking_form
+    - active_loop: booking_form

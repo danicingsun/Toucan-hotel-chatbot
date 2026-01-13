@@ -30,17 +30,21 @@ class ValidateBookingForm(FormValidationAction):
         return "validate_booking_form"
 
     def validate(self, dispatcher, tracker, domain):
-        # --- Pattern 1: change mid-form ---
+        # --- Pattern 1: detect change mid-form ---
         booking_field = tracker.get_slot("booking_field")
         if booking_field:
-            dispatcher.utter_message(f"Okay, let's update your {booking_field}. What is the new value?")
+            dispatcher.utter_message(
+                f"Okay, let's update your {booking_field}. What is the new value?"
+            )
+            # Pause the form and prepare to receive the new value
             return [
-                SlotSet(booking_field, None),
+                ActiveLoop(None),                 # pause the form
+                SlotSet(booking_field, None),     # clear the slot
                 SlotSet("requested_slot", booking_field),
-                SlotSet("booking_field", None)
+                SlotSet("booking_field", None)    # reset the trigger slot
             ]
 
-        # Otherwise, continue normal validation
+        # --- Otherwise, continue normal validation ---
         return super().validate(dispatcher, tracker, domain)
 
     # --------------------------
