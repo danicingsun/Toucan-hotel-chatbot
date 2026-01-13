@@ -75,7 +75,7 @@ class ValidateBookingForm(FormValidationAction):
                 "Sure — what would you like to change? "
                 "You can say: name, dates, room type, guests, breakfast, payment or refund."
             )
-            return []
+            return [SlotSet("requested_slot", None)]
 
 
         # --------------------------------------------------
@@ -237,23 +237,3 @@ class ActionSubmitBookingConfirmed(Action):
         ]
 
         return [SlotSet(slot, None) for slot in reset_slots] + [ActiveLoop(None)]
-
-
-# ============================================================
-# CHANGE BOOKING
-# ============================================================
-class ActionHandleBookingChange(Action):
-
-    def name(self) -> str:
-        return "action_handle_booking_change"
-
-    def run(self, dispatcher, tracker, domain):
-        booking_field = tracker.get_slot("booking_field")
-
-        if not booking_field:
-            dispatcher.utter_message(
-                "What would you like to change? For example: name, dates, room type, guests, payment, refund or breakfast."
-            )
-            return []
-
-        return []
