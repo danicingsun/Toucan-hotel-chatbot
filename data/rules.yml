@@ -5,7 +5,7 @@ version: "3.1"
 # --------------------------------------------------
 - rule: Activate booking form
   steps:
-    - intent: start_booking
+    - intent: book_hotel
     - action: booking_form
     - active_loop: booking_form
 

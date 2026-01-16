@@ -22,7 +22,7 @@ nlu:
     - hey friend
     - hiya
 
-- intent: start_booking
+- intent: book_hotel
   examples: |
     - I want to book a hotel room
     - Can you help me book a room?
