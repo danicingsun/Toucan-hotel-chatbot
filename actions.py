@@ -46,7 +46,6 @@ class ValidateBookingForm(FormValidationAction):
                dispatcher.utter_message(f"Okay, let's update the {field}.") 
                return { 
                    field: None, # reset the field they want to change
-                   current_slot: None, 
                    "name": None, # reset current slot 
                    "requested_slot": None # pause form 
                } 
@@ -69,7 +68,6 @@ class ValidateBookingForm(FormValidationAction):
                dispatcher.utter_message(f"Okay, let's update the {field}.") 
                return { 
                    field: None, # reset the field they want to change 
-                   current_slot: None,
                    "checkin": None, # reset current slot 
                    "requested_slot": None # pause form 
                } 
