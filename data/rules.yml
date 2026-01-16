@@ -5,7 +5,7 @@ version: "3.1"
 # --------------------------------------------------
 - rule: Activate booking form
   steps:
-    - intent: book_hotel
+    - intent: start_booking
     - action: booking_form
     - active_loop: booking_form
 
@@ -32,9 +32,22 @@ version: "3.1"
     - active_loop: null
     - action: action_submit_booking_confirmed
 
+# --------------------------------------------------
+# Change non-existing booking
+# --------------------------------------------------
 - rule: Change booking without active form
   condition:
     - active_loop: null
   steps:
     - intent: change_booking
     - action: utter_no_active_booking
+
+# --------------------------------------------------
+# Cancel booking
+# --------------------------------------------------
+- rule: Cancel booking mid-form
+  condition:
+    - active_loop: booking_form
+  steps:
+    - intent: stop
+    - action: action_cancel_booking

@@ -4,6 +4,9 @@ intents:
   - start_booking
   - change_booking
   - cancel_booking
+  - affirm
+  - deny
+  - greet
 
 entities:
   - booking_field
@@ -83,7 +86,7 @@ slots:
 
   confirmation: 
     type: text 
-    influence_conversation: true 
+    influence_conversation: false 
     mappings: 
       - type: from_intent 
         intent: affirm 
@@ -100,7 +103,7 @@ slots:
 
   booking_field:
     type: text
-    influence_conversation: true
+    influence_conversation: false
     mappings:
       - type: from_entity
         entity: booking_field
