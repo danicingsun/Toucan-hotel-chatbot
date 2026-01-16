@@ -120,6 +120,13 @@ nlu:
     - I made a mistake in my booking
     - I want to adjust the booking
     - I need to make a change
+    - that's wrong
+    - no wait, that's not correct
+    - I need to change something
+    - actually, that's not right
+    - I made a mistake
+    - let me fix that
+    - I want to update something
     - change the [name](booking_field)
     - update the guest [name](booking_field)
     - the [name](booking_field) is wrong
@@ -175,6 +182,9 @@ nlu:
     - actually change the [checkin](booking_field)
     - sorry, I meant the [room_type](booking_field)
     - no, change the [checkout](booking_field)
+    - [checkout](booking_field) is wrong
+    - [room_type](booking_field) needs to be updated
+    - [payment](booking_field) should be different
 
 lookup: booking_field
 examples: | 
@@ -186,3 +196,99 @@ examples: |
     - breakfast 
     - payment 
     - refund
+
+entity_synonyms: 
+  - synonym: name
+    examples: |
+      - my name
+      - guest name
+      - the name
+      - reservation name
+      - booking name
+      - wrong name
+      - change the name
+
+  - synonym: checkin 
+    examples: | 
+      - check-in 
+      - check in 
+      - arrival
+      - arrival date
+      - start date
+      - date of arrival
+      - checkin date
+      - check-in date
+      - arrival day
+      - day I arrive
+
+  - synonym: checkout 
+    examples: | 
+      - check-out 
+      - check out 
+      - departure
+      - departure date
+      - leaving date
+      - end date
+      - date of departure
+      - checkout date
+      - check-out date
+      - day I leave
+
+  - synonym: guests
+    examples: |
+      - number of guests
+      - guest count
+      - people
+      - persons
+      - occupants
+      - number of people
+      - number of persons
+      - how many guests
+      - guest number
+      - party size
+      - group size
+
+  - synonym: room_type 
+    examples: | 
+      - room type
+      - type of room
+      - room category
+      - room option
+      - kind of room
+      - room choice
+      - room selection
+      - the room
+      - room preference
+
+  - synonym: breakfast
+    examples: |
+      - morning meal
+      - breakfast option
+      - breakfast included
+      - add breakfast
+      - remove breakfast
+      - breakfast choice
+      - breakfast selection
+
+  - synonym: payment
+    examples: |
+      - payment method
+      - how I pay
+      - pay with card
+      - pay by card
+      - credit
+      - credit card
+      - cash
+      - payment option
+      - payment choice
+
+  - synonym: refund
+    examples: |
+      - refund policy
+      - refundable
+      - non-refundable
+      - nonrefundable
+      - cancellation policy
+      - refund option
+      - refund choice
+      - refund type

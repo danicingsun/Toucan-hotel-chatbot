@@ -9,14 +9,6 @@ intents:
   - change_booking
 
 entities:
-  - name
-  - checkin
-  - checkout
-  - guests
-  - room_type
-  - breakfast
-  - payment
-  - refund
   - booking_field
 
 slots:
@@ -37,22 +29,12 @@ slots:
         conditions:
           - active_loop: booking_form
             requested_slot: checkin
-      - type: from_entity
-        entity: checkin
-        conditions:
-          - active_loop: booking_form
-            requested_slot: checkin
 
   checkout:
     type: text
     influence_conversation: false
     mappings:
       - type: from_text
-        conditions:
-          - active_loop: booking_form
-            requested_slot: checkout
-      - type: from_entity
-        entity: checkout
         conditions:
           - active_loop: booking_form
             requested_slot: checkout
@@ -65,22 +47,12 @@ slots:
         conditions:
           - active_loop: booking_form
             requested_slot: guests
-      - type: from_entity
-        entity: guests
-        conditions:
-          - active_loop: booking_form
-            requested_slot: guests
 
   room_type:
     type: text
     influence_conversation: false
     mappings:
       - type: from_text
-        conditions:
-          - active_loop: booking_form
-            requested_slot: room_type
-      - type: from_entity
-        entity: room_type
         conditions:
           - active_loop: booking_form
             requested_slot: room_type
@@ -93,11 +65,6 @@ slots:
         conditions:
           - active_loop: booking_form
             requested_slot: breakfast
-      - type: from_entity
-        entity: breakfast
-        conditions:
-          - active_loop: booking_form
-            requested_slot: breakfast
 
   payment:
     type: text
@@ -107,22 +74,12 @@ slots:
         conditions:
           - active_loop: booking_form
             requested_slot: payment
-      - type: from_entity
-        entity: payment
-        conditions:
-          - active_loop: booking_form
-            requested_slot: payment
 
   refund:
     type: text
     influence_conversation: false
     mappings:
       - type: from_text
-        conditions:
-          - active_loop: booking_form
-            requested_slot: refund
-      - type: from_entity
-        entity: refund
         conditions:
           - active_loop: booking_form
             requested_slot: refund
@@ -150,10 +107,13 @@ slots:
     mappings:
       - type: from_entity
         entity: booking_field
+        conditions: 
+          - active_loop: booking_form
 
 forms:
   booking_form:
     required_slots:
+      - booking_field
       - name
       - checkin
       - checkout
@@ -227,10 +187,13 @@ responses:
           payload: "/deny"
 
   utter_no_active_booking:
-    - text: "You don’t have an active booking to cancel."
+    - text: "You don’t have an active booking to change."
 
   utter_cancel_booking:
     - text: "Your booking has been cancelled. All details were cleared."
+
+  utter_ask_booking_form_booking_field: 
+    - text: ""
 
 actions:
   - validate_booking_form

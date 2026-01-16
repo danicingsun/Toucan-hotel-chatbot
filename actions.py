@@ -50,6 +50,9 @@ class ValidateBookingForm(FormValidationAction):
     # --------------------------
     # Slot validators
     # --------------------------
+    def validate_booking_field(self, value, dispatcher, tracker, domain):
+        return {"booking_field": value}
+
     def validate_name(self, value, dispatcher, tracker, domain):
         if not value or len(value.split()) > 4 or any(word in value.lower() for word in ["book", "start", "cancel", "stop", "booking", "deny", "room", "please"]):
             unclear_value(dispatcher)
