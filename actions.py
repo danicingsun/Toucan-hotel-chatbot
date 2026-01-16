@@ -22,6 +22,9 @@ def normalize_text(value):
 def unclear_value(dispatcher):
     dispatcher.utter_message("I’m not sure I understood that. Could you please repeat your answer?")
 
+def _user_wants_to_change(tracker): 
+    return tracker.latest_message.intent.get("name") == "change_booking"
+
 # ============================================================
 # FORM VALIDATION
 # ============================================================
@@ -53,13 +56,45 @@ class ValidateBookingForm(FormValidationAction):
     def validate_booking_field(self, value, dispatcher, tracker, domain):
         return {"booking_field": value}
 
-    def validate_name(self, value, dispatcher, tracker, domain):
+    def validate_name(self, value, dispatcher, tracker, domain): 
+        # Check if user wants to change previous slots 
+        if _user_wants_to_change(tracker): 
+           field = next(tracker.get_latest_entity_values("booking_field"), None) 
+           if field: 
+               dispatcher.utter_message(f"Okay, let's update the {field}.") 
+               return { 
+                   field: None, # reset the field they want to change 
+                   "name": None, # reset current slot 
+                   "requested_slot": None # pause form 
+               } 
+           dispatcher.utter_message("Sure — which detail would you like to change?") 
+           return { 
+               "name": None, 
+               "requested_slot": None 
+           } 
+        # Continue with normal validation
         if not value or len(value.split()) > 4 or any(word in value.lower() for word in ["book", "start", "cancel", "stop", "booking", "deny", "room", "please"]):
             unclear_value(dispatcher)
             return {"name": None}
         return {"name": value.strip()}
 
     def validate_checkin(self, value, dispatcher, tracker, domain):
+        # Check if user wants to change previous slots 
+        if _user_wants_to_change(tracker): 
+           field = next(tracker.get_latest_entity_values("booking_field"), None) 
+           if field: 
+               dispatcher.utter_message(f"Okay, let's update the {field}.") 
+               return { 
+                   field: None, # reset the field they want to change 
+                   "checkin": None, # reset current slot 
+                   "requested_slot": None # pause form 
+               } 
+           dispatcher.utter_message("Sure — which detail would you like to change?") 
+           return { 
+               "checkin": None, 
+               "requested_slot": None 
+           } 
+        # Continue with normal validation
         if not value:
             unclear_value(dispatcher)
             return {"checkin": None}
@@ -74,6 +109,22 @@ class ValidateBookingForm(FormValidationAction):
             return {"checkin": None}
 
     def validate_checkout(self, value, dispatcher, tracker, domain): 
+        # Check if user wants to change previous slots 
+        if _user_wants_to_change(tracker): 
+           field = next(tracker.get_latest_entity_values("booking_field"), None) 
+           if field: 
+               dispatcher.utter_message(f"Okay, let's update the {field}.") 
+               return { 
+                   field: None, # reset the field they want to change 
+                   "name": None, # reset current slot 
+                   "requested_slot": None # pause form 
+               } 
+           dispatcher.utter_message("Sure — which detail would you like to change?") 
+           return { 
+               "name": None, 
+               "requested_slot": None 
+           } 
+        # Continue with normal validation
         if not value:
             unclear_value(dispatcher)
             return {"checkout": None}
