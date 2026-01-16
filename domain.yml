@@ -107,13 +107,10 @@ slots:
     mappings:
       - type: from_entity
         entity: booking_field
-        conditions: 
-          - active_loop: booking_form
 
 forms:
   booking_form:
     required_slots:
-      - booking_field
       - name
       - checkin
       - checkout
@@ -191,9 +188,6 @@ responses:
 
   utter_cancel_booking:
     - text: "Your booking has been cancelled. All details were cleared."
-
-  utter_ask_booking_form_booking_field: 
-    - text: ""
 
 actions:
   - validate_booking_form
