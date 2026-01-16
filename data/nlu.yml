@@ -21,6 +21,7 @@ nlu:
     - what's up
     - hey friend
     - hiya
+    - hallo
 
 - intent: book_hotel
   examples: |
