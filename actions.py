@@ -22,9 +22,6 @@ def normalize_text(value):
 def unclear_value(dispatcher):
     dispatcher.utter_message("I’m not sure I understood that. Could you please repeat your answer?")
 
-def _user_wants_to_change(tracker): 
-    return tracker.latest_message.intent.get("name") == "change_booking"
-
 # ============================================================
 # FORM VALIDATION
 # ============================================================
@@ -39,44 +36,12 @@ class ValidateBookingForm(FormValidationAction):
         return {"booking_field": value}
 
     def validate_name(self, value, dispatcher, tracker, domain): 
-        # Check if user wants to change previous slots 
-        if _user_wants_to_change(tracker): 
-           field = next(tracker.get_latest_entity_values("booking_field"), None) 
-           if field: 
-               dispatcher.utter_message(f"Okay, let's update the {field}.") 
-               return { 
-                   field: None, # reset the field they want to change
-                   "name": None, # reset current slot 
-                   "requested_slot": None # pause form 
-               } 
-           dispatcher.utter_message("Sure — which detail would you like to change?") 
-           return { 
-               "name": None, 
-               "requested_slot": None 
-           } 
-        # Continue with normal validation
         if not value or len(value.split()) > 4 or any(word in value.lower() for word in ["book", "start", "cancel", "stop", "booking", "deny", "room", "please"]):
             unclear_value(dispatcher)
             return {"name": None}
         return {"name": value.strip()}
 
     def validate_checkin(self, value, dispatcher, tracker, domain):
-        # Check if user wants to change previous slots 
-        if _user_wants_to_change(tracker): 
-           field = next(tracker.get_latest_entity_values("booking_field"), None) 
-           if field: 
-               dispatcher.utter_message(f"Okay, let's update the {field}.") 
-               return { 
-                   field: None, # reset the field they want to change 
-                   "checkin": None, # reset current slot 
-                   "requested_slot": None # pause form 
-               } 
-           dispatcher.utter_message("Sure — which detail would you like to change?") 
-           return { 
-               "checkin": None, 
-               "requested_slot": None 
-           } 
-        # Continue with normal validation
         if not value:
             unclear_value(dispatcher)
             return {"checkin": None}
@@ -91,22 +56,6 @@ class ValidateBookingForm(FormValidationAction):
             return {"checkin": None}
 
     def validate_checkout(self, value, dispatcher, tracker, domain): 
-        # Check if user wants to change previous slots 
-        if _user_wants_to_change(tracker): 
-           field = next(tracker.get_latest_entity_values("booking_field"), None) 
-           if field: 
-               dispatcher.utter_message(f"Okay, let's update the {field}.") 
-               return { 
-                   field: None, # reset the field they want to change 
-                   "name": None, # reset current slot 
-                   "requested_slot": None # pause form 
-               } 
-           dispatcher.utter_message("Sure — which detail would you like to change?") 
-           return { 
-               "name": None, 
-               "requested_slot": None 
-           } 
-        # Continue with normal validation
         if not value:
             unclear_value(dispatcher)
             return {"checkout": None}
@@ -230,9 +179,45 @@ class ActionSubmitBookingConfirmed(Action):
             else "✅ Your booking is confirmed! We look forward to welcoming you at our hotel!"
         )
 
-        reset_slots = [
-            "name", "checkin", "checkout", "guests",
-            "room_type", "breakfast", "payment", "refund", "confirmation", "requested_slot"
+        return [
+            SlotSet("name", None),
+            SlotSet("checkin", None),
+            SlotSet("checkout", None),
+            SlotSet("guests", None),
+            SlotSet("room_type", None),
+            SlotSet("breakfast", None),
+            SlotSet("payment", None),
+            SlotSet("refund", None),
+            SlotSet("confirmation", None),
+            SlotSet("requested_slot", None),
+            ActiveLoop(None),
         ]
 
-        return [SlotSet(slot, None) for slot in reset_slots] + [ActiveLoop(None)]
+
+class ActionHandleChange(Action):
+    def name(self):
+        return "action_handle_change"
+
+    def run(self, dispatcher, tracker, domain):
+        field = next(tracker.get_latest_entity_values("booking_field"), None)
+
+        # Pause the form no matter what
+        events = [ActiveLoop(None)]
+
+        if not field:
+            dispatcher.utter_message(
+                "Sure — what would you like to change? "
+                "You can say name, dates, room type, guests, payment, etc."
+            )
+            return events
+
+        dispatcher.utter_message(
+            f"Okay, let's update your {field}. What is the new value?"
+        )
+
+        events.extend([
+            SlotSet(field, None),              # clear old value
+            SlotSet("requested_slot", field),  # ask for this slot
+        ])
+
+        return events

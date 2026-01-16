@@ -1,9 +1,7 @@
 version: "3.1"
 
-rules:
-
-# -------------------------------------------------- 
-# Activate booking form 
+# --------------------------------------------------
+# Start booking
 # --------------------------------------------------
 - rule: Activate booking form
   steps:
@@ -11,56 +9,32 @@ rules:
     - action: booking_form
     - active_loop: booking_form
 
-# -------------------------------------------------- 
-# Continue booking form 
-# -------------------------------------------------- 
-- rule: Continue booking form 
-  condition: 
-    - active_loop: booking_form 
-  steps: 
-    - action: booking_form 
-    - active_loop: booking_form
-
-
-# -------------------------------------------------- 
-# Tell user no active booking is present
 # --------------------------------------------------
-- rule: Change booking before form starts 
-  steps: 
-    - intent: change_booking 
-    - action: utter_no_active_booking
-
-# -------------------------------------------------- 
-# User change during form 
-# -------------------------------------------------- 
-- rule: User wants to change a slot during the form 
-  condition: 
-    - active_loop: booking_form 
-  steps: 
-    - intent: change_booking 
-    - slot_was_set: 
-        - booking_field: true 
-    - action: booking_form 
-
-# -------------------------------------------------- 
-# Cancel form 
+# Handle change DURING form
 # --------------------------------------------------
-- rule: Cancel booking during form
+- rule: Change booking during form
   condition:
     - active_loop: booking_form
   steps:
-    - intent: stop
-    - action: action_cancel_booking
-    - active_loop: null
+    - intent: change_booking
+    - action: action_handle_change
+    - action: booking_form
+    - active_loop: booking_form
 
-# -------------------------------------------------- 
-# Submit form 
-# -------------------------------------------------- 
-- rule: Submit booking form 
-  condition: 
-    - active_loop: booking_form 
-  steps: 
+# --------------------------------------------------
+# Submit booking
+# --------------------------------------------------
+- rule: Submit booking form
+  condition:
+    - active_loop: booking_form
+  steps:
     - action: booking_form
     - active_loop: null
     - action: action_submit_booking_confirmed
 
+- rule: Change booking without active form
+  condition:
+    - active_loop: null
+  steps:
+    - intent: change_booking
+    - action: utter_no_active_booking
