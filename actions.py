@@ -292,7 +292,8 @@ class ActionSendConfirmationEmail(Action):
 
         try: 
             # Gmail SMTP with SSL 
-            with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:                  server.login(email_user, email_password) 
+            with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:                  
+                server.login(email_user, email_password) 
                 server.send_message(msg) 
 
             dispatcher.utter_message("Your confirmation email has been sent.") 
