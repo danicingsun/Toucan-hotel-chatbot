@@ -1,3 +1,7 @@
 version: "3.1" 
 
-stories: []
+stories: 
+- story: greet and book
+  steps:
+    - intent: greet
+    - action: utter_greet
