@@ -285,21 +285,21 @@ class ActionSendConfirmationEmail(Action):
             f"We look forward to welcoming you!" 
          ) 
   
-         msg = MIMEText(body)
-         msg["Subject"] = "Your Hotel Booking Confirmation" 
-         msg["From"] = email_user 
-         msg["To"] = user_email 
+        msg = MIMEText(body)
+        msg["Subject"] = "Your Hotel Booking Confirmation" 
+        msg["From"] = email_user 
+        msg["To"] = user_email 
 
-         try: 
-             # Gmail SMTP with SSL 
-             with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server: 
-                 server.login(email_user, email_password) 
-                 server.send_message(msg) 
+        try: 
+            # Gmail SMTP with SSL 
+            with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:                  server.login(email_user, email_password) 
+                server.send_message(msg) 
 
-             dispatcher.utter_message("Your confirmation email has been sent.") 
-         except Exception as e: 
-             dispatcher.utter_message( "I couldn't send the confirmation email, but your booking is saved." 
-             ) 
-             print(f"Email error: {e}") 
+            dispatcher.utter_message("Your confirmation email has been sent.") 
+        except Exception as e: 
+            dispatcher.utter_message( 
+                "I couldn't send the confirmation email, but your booking is saved." 
+            ) 
+            print(f"Email error: {e}") 
 
-         return []
+        return []
