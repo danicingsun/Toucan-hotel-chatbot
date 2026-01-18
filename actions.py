@@ -285,7 +285,7 @@ class ActionSendConfirmationEmail(Action):
             f"We look forward to welcoming you!" 
          ) 
   
-         msg = MIMEText(body) 
+         msg = MIMEText(body)
          msg["Subject"] = "Your Hotel Booking Confirmation" 
          msg["From"] = email_user 
          msg["To"] = user_email 
