@@ -84,6 +84,15 @@ slots:
           - active_loop: booking_form
             requested_slot: refund
 
+  email:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_text
+        conditions:
+          - active_loop: booking_form
+            requested_slot: email
+
   confirmation: 
     type: text 
     influence_conversation: false 
@@ -119,6 +128,7 @@ forms:
       - breakfast
       - payment
       - refund
+      - email
       - confirmation
 
 responses:
@@ -164,6 +174,9 @@ responses:
         - title: "Non-refundable"
           payload: "non-refundable"
 
+  utter_ask_booking_form_email: 
+    - text: "{name}, could you please provide email address?"
+
   utter_ask_booking_form_confirmation:
     - text: |
         Here is your booking summary:
@@ -188,6 +201,7 @@ responses:
 
   utter_cancel_booking:
     - text: "Your booking has been cancelled. All details were cleared."
+
 
 actions:
   - validate_booking_form

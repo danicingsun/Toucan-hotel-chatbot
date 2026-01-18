@@ -3,9 +3,14 @@ from rasa_sdk import Action, Tracker
 from rasa_sdk.forms import FormValidationAction
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.events import SlotSet, ActiveLoop
+import os 
+import smtplib 
+from email.mime.text import MIMEText 
+from rasa_sdk import Action, Tracker 
+import re
 
 # ============================================================
-# CONSTANTS
+# Constants
 # ============================================================
 DATE_FORMAT = "%Y-%m-%d"
 MAX_GUESTS = 4
@@ -14,7 +19,7 @@ YES_VALUES = {"yes", "y", "true"}
 NO_VALUES = {"no", "n", "false"}
 
 # ============================================================
-# UTILITY FUNCTIONS
+# Utility functions
 # ============================================================
 def normalize_text(value):
     return value.strip().lower() if value else None
@@ -23,7 +28,7 @@ def unclear_value(dispatcher):
     dispatcher.utter_message("I’m not sure I understood that. Could you please repeat your answer?")
 
 # ============================================================
-# FORM VALIDATION
+# Form validation
 # ============================================================
 class ValidateBookingForm(FormValidationAction):
     def name(self) -> str:
@@ -40,6 +45,24 @@ class ValidateBookingForm(FormValidationAction):
             unclear_value(dispatcher)
             return {"name": None}
         return {"name": value.strip()}
+
+    def validate_email( 
+        self, 
+        slot_value: Any, 
+        dispatcher: CollectingDispatcher, 
+        tracker: Tracker, 
+        domain: DomainDict, 
+    ) -> Dict[Text, Any]: 
+
+        # Basic but reliable email regex 
+        email_pattern = r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$" 
+        
+        if re.match(email_pattern, slot_value): return {"email": slot_value} 
+
+        dispatcher.utter_message( text="That doesn’t look like a valid email address. Could you enter it again?" ) 
+
+        return {"email": None}
+
 
     def validate_checkin(self, value, dispatcher, tracker, domain):
         if not value:
@@ -135,7 +158,7 @@ class ValidateBookingForm(FormValidationAction):
         return {"confirmation": None}
 
 # ============================================================
-# CANCEL BOOKING
+# Cancel booking
 # ============================================================
 class ActionCancelBooking(Action):
     def name(self):
@@ -144,7 +167,7 @@ class ActionCancelBooking(Action):
     def run(self, dispatcher, tracker, domain):
         dispatcher.utter_message("Your booking has been cancelled. All details were cleared.")
         slots_to_reset = [
-            "name", "checkin", "checkout", "guests",
+            "name", "email", "checkin", "checkout", "guests",
             "room_type", "breakfast", "payment",
             "refund", "confirmation", "booking_field"
         ]
@@ -158,7 +181,7 @@ class ActionCancelBooking(Action):
 
 
 # ============================================================
-# CONFIRM BOOKING
+# Confirm booking
 # ============================================================
 class ActionSubmitBookingConfirmed(Action):
     def name(self):
@@ -181,6 +204,7 @@ class ActionSubmitBookingConfirmed(Action):
 
         return [
             SlotSet("name", None),
+            SlotSet("email", None),
             SlotSet("checkin", None),
             SlotSet("checkout", None),
             SlotSet("guests", None),
@@ -193,7 +217,9 @@ class ActionSubmitBookingConfirmed(Action):
             ActiveLoop(None),
         ]
 
-
+# ============================================================
+# Handle change in booking
+# ============================================================
 class ActionHandleChange(Action):
     def name(self):
         return "action_handle_change"
@@ -201,23 +227,79 @@ class ActionHandleChange(Action):
     def run(self, dispatcher, tracker, domain):
         field = next(tracker.get_latest_entity_values("booking_field"), None)
 
-        # Pause the form no matter what
-        events = [ActiveLoop(None)]
-
         if not field:
             dispatcher.utter_message(
                 "Sure — what would you like to change? "
                 "You can say name, dates, room type, guests, payment, etc."
             )
-            return events
+            return []
+
+        if field not in domain.get("slots", {}):
+            dispatcher.utter_message("That field cannot be changed.")
+            return []
 
         dispatcher.utter_message(
-            f"Okay, let's update your {field}. What is the new value?"
+            f"Okay, let's update your {field}."
         )
 
-        events.extend([
+        return [
             SlotSet(field, None),              # clear old value
             SlotSet("requested_slot", field),  # ask for this slot
-        ])
+        ]
 
-        return events
+
+# ============================================================
+# Send confirmation email
+# ============================================================
+class ActionSendConfirmationEmail(Action): 
+
+    def name(self) -> str: 
+        return "action_send_confirmation_email" 
+
+    def run( self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict, ): 
+        # Retrieve secrets from environment variables 
+        email_user = os.getenv("EMAIL_USER") 
+        email_password = os.getenv("EMAIL_PASSWORD") 
+
+        # Retrieve booking details from slots 
+        user_email = tracker.get_slot("email") 
+        check_in = tracker.get_slot("checkin") 
+        check_out = tracker.get_slot("checkout") 
+        room_type = tracker.get_slot("room_type") 
+        guests = tracker.get_slot("guests") 
+        breakfast = tracker.get_slot("breakfast")
+        payment = tracker.get_slot("payment")
+        refund = tracker.get_slot("refund")
+
+        # Build email content 
+        body = ( 
+            f"Thank you for your reservation!\n\n" 
+            f"Here are your booking details:\n" 
+            f"- Room type: {room_type}\n" 
+            f"- Guests: {guests}\n" 
+            f"- Check-in: {check_in}\n" 
+            f"- Check-out: {check_out}\n\n" 
+            f"- Breakfast included: {breakfast}\n\n" 
+            f"- Refund policy: {refund}\n\n" 
+            f"- Payment method: {payment}\n\n" 
+            f"We look forward to welcoming you!" 
+         ) 
+  
+         msg = MIMEText(body) 
+         msg["Subject"] = "Your Hotel Booking Confirmation" 
+         msg["From"] = email_user 
+         msg["To"] = user_email 
+
+         try: 
+             # Gmail SMTP with SSL 
+             with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server: 
+                 server.login(email_user, email_password) 
+                 server.send_message(msg) 
+
+             dispatcher.utter_message("Your confirmation email has been sent.") 
+         except Exception as e: 
+             dispatcher.utter_message( "I couldn't send the confirmation email, but your booking is saved." 
+             ) 
+             print(f"Email error: {e}") 
+
+         return []

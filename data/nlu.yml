@@ -122,6 +122,7 @@ nlu:
     - I want to adjust the booking
     - I need to make a change
     - that's wrong
+    - that was wrong
     - no wait, that's not correct
     - I need to change something
     - actually, that's not right
@@ -132,6 +133,12 @@ nlu:
     - update the guest [name](booking_field)
     - the [name](booking_field) is wrong
     - I want to change the booking [name](booking_field)
+    - change the [email](booking_field)
+    - update the guest [email](booking_field)
+    - update the [email](booking_field)
+    - the [email](booking_field) is wrong
+    - I want to change the booking [email](booking_field)
+    - I need to change my [email](booking_field)
     - change the [checkin](booking_field)
     - update the [checkin](booking_field) date
     - I want to change my [checkin](booking_field)
@@ -186,6 +193,7 @@ nlu:
     - [checkout](booking_field) is wrong
     - [room_type](booking_field) needs to be updated
     - [payment](booking_field) should be different
+    - [email](booking_field) should be different
 
 lookup: booking_field
 examples: | 
@@ -293,3 +301,13 @@ entity_synonyms:
       - refund option
       - refund choice
       - refund type
+
+  - synonym: email
+    examples: |
+      - email
+      - email address
+      - address
+      - adres
+      - email adres
+      - mail adres
+      - mail address
