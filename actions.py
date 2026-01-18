@@ -6,8 +6,9 @@ from rasa_sdk.events import SlotSet, ActiveLoop
 import os 
 import smtplib 
 from email.mime.text import MIMEText 
-from rasa_sdk import Action, Tracker 
 import re
+from typing import Any, Dict, Text
+from rasa_sdk.types import DomainDict
 
 # ============================================================
 # Constants
