@@ -1,5 +1,7 @@
 version: "3.1"
 
+rules: 
+
 # --------------------------------------------------
 # Start booking
 # --------------------------------------------------
@@ -9,6 +11,13 @@ version: "3.1"
     - action: booking_form
     - active_loop: booking_form
 
+# --------------------------------------------------
+# Greet
+# --------------------------------------------------
+- rule: Say hello
+  steps:
+    - intent: greet
+    - action: utter_greet
 
 # --------------------------------------------------
 # Handle change DURING form
