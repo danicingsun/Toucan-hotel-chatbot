@@ -188,6 +188,7 @@ responses:
         • Breakfast: {breakfast}
         • Payment: {payment}
         • Refund policy: {refund}
+        • Email address: {email}
 
         Would you like to confirm the booking?
       buttons:
@@ -208,3 +209,4 @@ actions:
   - action_submit_booking_confirmed
   - action_cancel_booking
   - action_handle_change 
+  - action_send_confirmation_email

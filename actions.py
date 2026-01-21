@@ -2,7 +2,7 @@ from datetime import datetime
 from rasa_sdk import Action, Tracker
 from rasa_sdk.forms import FormValidationAction
 from rasa_sdk.executor import CollectingDispatcher
-from rasa_sdk.events import SlotSet, ActiveLoop
+from rasa_sdk.events import SlotSet, ActiveLoop, FollowupAction
 import os 
 import smtplib 
 from email.mime.text import MIMEText 
@@ -165,7 +165,7 @@ class ActionCancelBooking(Action):
     def name(self):
         return "action_cancel_booking"
 
-    def run(self, dispatcher, tracker, domain):
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict):
         dispatcher.utter_message("Your booking has been cancelled. All details were cleared.")
         slots_to_reset = [
             "name", "email", "checkin", "checkout", "guests",
@@ -188,14 +188,30 @@ class ActionSubmitBookingConfirmed(Action):
     def name(self):
         return "action_submit_booking_confirmed"
 
-    def run(self, dispatcher, tracker, domain):
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict):
         confirmation = tracker.get_slot("confirmation")
 
+        # If not confirmed -> cancel + reset + end loop
         if confirmation != "yes":
             dispatcher.utter_message("Your booking has been cancelled. All details were cleared.")
-            return [SlotSet(slot, None) for slot in tracker.slots] + [ActiveLoop(None)]
+            return [
+                SlotSet("name", None),
+                SlotSet("email", None),
+                SlotSet("checkin", None),
+                SlotSet("checkout", None),
+                SlotSet("guests", None),
+                SlotSet("room_type", None),
+                SlotSet("breakfast", None),
+                SlotSet("payment", None),
+                SlotSet("refund", None),
+                SlotSet("confirmation", None),
+                SlotSet("requested_slot", None),
+                ActiveLoop(None),
+            ]
 
+        # Confirmed
         name = tracker.get_slot("name")
+        user_email = tracker.get_slot("email")
 
         dispatcher.utter_message(
             f"✅ Thank you {name}, your booking is confirmed! We look forward to welcoming you at our hotel!"
@@ -203,20 +219,19 @@ class ActionSubmitBookingConfirmed(Action):
             else "✅ Your booking is confirmed! We look forward to welcoming you at our hotel!"
         )
 
-        return [
-            SlotSet("name", None),
-            SlotSet("email", None),
-            SlotSet("checkin", None),
-            SlotSet("checkout", None),
-            SlotSet("guests", None),
-            SlotSet("room_type", None),
-            SlotSet("breakfast", None),
-            SlotSet("payment", None),
-            SlotSet("refund", None),
-            SlotSet("confirmation", None),
+        events = [
+            # end the form loop
             SlotSet("requested_slot", None),
             ActiveLoop(None),
         ]
+
+        # Trigger email only if we actually have an email
+        if user_email:
+            events.append(FollowupAction("action_send_confirmation_email"))
+        else:
+            dispatcher.utter_message("I don’t have an email address on file, so I can’t send a confirmation email.")
+        return events
+
 
 # ============================================================
 # Handle change in booking
@@ -225,7 +240,7 @@ class ActionHandleChange(Action):
     def name(self):
         return "action_handle_change"
 
-    def run(self, dispatcher, tracker, domain):
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict):
         field = next(tracker.get_latest_entity_values("booking_field"), None)
 
         if not field:
@@ -246,6 +261,8 @@ class ActionHandleChange(Action):
         return [
             SlotSet(field, None),              # clear old value
             SlotSet("requested_slot", field),  # ask for this slot
+            ActiveLoop("booking_form"),
+            FollowupAction("booking_form"),
         ]
 
 
@@ -257,7 +274,7 @@ class ActionSendConfirmationEmail(Action):
     def name(self) -> str: 
         return "action_send_confirmation_email" 
 
-    def run( self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict, ): 
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict):
         # Retrieve secrets from environment variables 
         email_user = os.getenv("EMAIL_USER") 
         email_password = os.getenv("EMAIL_PASSWORD") 
@@ -271,6 +288,24 @@ class ActionSendConfirmationEmail(Action):
         breakfast = tracker.get_slot("breakfast")
         payment = tracker.get_slot("payment")
         refund = tracker.get_slot("refund")
+
+        # Check if hotel email is provided as server variable
+        if not email_user or not email_password:
+           dispatcher.utter_message("Email is not configured on the server, but your booking is confirmed.")
+           return [
+               SlotSet("name", None),
+               SlotSet("email", None),
+               SlotSet("checkin", None),
+               SlotSet("checkout", None),
+               SlotSet("guests", None),
+               SlotSet("room_type", None),
+               SlotSet("breakfast", None),
+               SlotSet("payment", None),
+               SlotSet("refund", None),
+               SlotSet("confirmation", None),
+               SlotSet("requested_slot", None),
+               ActiveLoop(None),
+            ]
 
         # Build email content 
         body = ( 
@@ -304,4 +339,17 @@ class ActionSendConfirmationEmail(Action):
             ) 
             print(f"Email error: {e}") 
 
-        return []
+        return [
+            SlotSet("name", None),
+            SlotSet("email", None),
+            SlotSet("checkin", None),
+            SlotSet("checkout", None),
+            SlotSet("guests", None),
+            SlotSet("room_type", None),
+            SlotSet("breakfast", None),
+            SlotSet("payment", None),
+            SlotSet("refund", None),
+            SlotSet("confirmation", None),
+            SlotSet("requested_slot", None),
+            ActiveLoop(None),
+        ]
