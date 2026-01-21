@@ -121,81 +121,121 @@ nlu:
     - I made a mistake in my booking
     - I want to adjust the booking
     - I need to make a change
-    - that's wrong
+    - something is wrong
+    - that’s wrong
     - that was wrong
-    - no wait, that's not correct
-    - I need to change something
-    - actually, that's not right
+    - no wait, that’s not correct
+    - actually, that’s not right
     - I made a mistake
     - let me fix that
     - I want to update something
+    - I need to correct something
+    - I want to fix an error
+    - can I edit this?
+    - I need to change something I said
+    - I want to revise my booking
     - change the [name](booking_field)
+    - change my [name](booking_field)
     - update the guest [name](booking_field)
     - the [name](booking_field) is wrong
-    - I want to change the booking [name](booking_field)
+    - I entered the wrong [name](booking_field)
+    - I need to fix the [name](booking_field)
+    - the booking [name](booking_field) is incorrect
+    - can I change the [name](booking_field)?
+    - please update the [name](booking_field)
+    - I want to use a different [name](booking_field)
+
     - change the [email](booking_field)
+    - change my [email](booking_field)
     - update the guest [email](booking_field)
-    - update the [email](booking_field)
     - the [email](booking_field) is wrong
-    - I want to change the booking [email](booking_field)
-    - I need to change my [email](booking_field)
+    - I typed the wrong [email](booking_field)
+    - I need to fix my [email](booking_field)
+    - please update my [email](booking_field)
+    - use a different [email](booking_field)
+    - can I change the [email](booking_field)?
+    - the booking [email](booking_field) is incorrect
+
     - change the [checkin](booking_field)
+    - change my [checkin](booking_field)
     - update the [checkin](booking_field) date
-    - I want to change my [checkin](booking_field)
     - modify the [checkin](booking_field) date
     - the [checkin](booking_field) date is wrong
     - I need a different [checkin](booking_field)
     - move my [checkin](booking_field)
     - adjust the [checkin](booking_field)
+    - change my arrival date [checkin](booking_field)
+    - I want to arrive later, change the [checkin](booking_field)
+    - can I change the [checkin](booking_field)?
+    - I want to come earlier, change the [checkin](booking_field)
+
     - change the [checkout](booking_field)
+    - change my [checkout](booking_field)
     - update the [checkout](booking_field) date
-    - I want to change my [checkout](booking_field)
     - modify the [checkout](booking_field)
     - the [checkout](booking_field) date is incorrect
     - I want to leave later, change the [checkout](booking_field)
+    - I want to leave earlier, change the [checkout](booking_field)
     - shorten my stay by changing the [checkout](booking_field)
+    - extend my stay, change the [checkout](booking_field)
+    - can I update the [checkout](booking_field)?
+
     - change the number of [guests](booking_field)
+    - change my [guests](booking_field)
     - update the [guests](booking_field)
     - I want to modify the [guests](booking_field)
     - there will be more [guests](booking_field)
-    - reduce the number of [guests](booking_field)
+    - there will be fewer [guests](booking_field)
     - add another [guests](booking_field)
+    - remove a [guests](booking_field)
     - the [guests](booking_field) count is wrong
+    - I need to fix the [guests](booking_field)
+    - can I change the [guests](booking_field)?
+
     - change the [room_type](booking_field)
+    - change my [room_type](booking_field)
     - I want a different [room_type](booking_field)
     - update the [room_type](booking_field)
     - switch the [room_type](booking_field)
     - modify the [room_type](booking_field)
     - I want to change to another [room_type](booking_field)
-    - the selected [room_type](booking_field) is not correct
+    - the selected [room_type](booking_field) is wrong
+    - I picked the wrong [room_type](booking_field)
+    - can I change the [room_type](booking_field)?
+
     - change the [breakfast](booking_field)
     - update the [breakfast](booking_field) option
     - I want to add [breakfast](booking_field)
-    - remove the [breakfast](booking_field)
+    - I want to remove [breakfast](booking_field)
     - modify the [breakfast](booking_field)
     - I no longer want [breakfast](booking_field)
+    - I forgot to add [breakfast](booking_field)
+    - can I change the [breakfast](booking_field)?
+
     - change the [payment](booking_field)
+    - change my [payment](booking_field)
     - update the [payment](booking_field) method
-    - I want to modify the [payment](booking_field)
     - switch the [payment](booking_field)
-    - change how I [payment](booking_field)
-    - update my [payment](booking_field) choice
+    - I want to pay differently, change the [payment](booking_field)
+    - the [payment](booking_field) method is wrong
+    - can I update the [payment](booking_field)?
+
     - change the [refund](booking_field)
     - update the [refund](booking_field) policy
-    - make the booking [refund](booking_field) able
-    - I want to modify the [refund](booking_field)
-    - switch the [refund](booking_field) option
-    - I want a different [refund](booking_field) policy
+    - I want a different [refund](booking_field) option
+    - switch the [refund](booking_field) policy
+    - I need to modify the [refund](booking_field)
+    - the [refund](booking_field) policy is wrong
+    - can I change the [refund](booking_field)?
+
     - oh wait, the [guests](booking_field) is wrong
     - actually change the [checkin](booking_field)
     - sorry, I meant the [room_type](booking_field)
     - no, change the [checkout](booking_field)
-    - [checkout](booking_field) is wrong
-    - [room_type](booking_field) needs to be updated
-    - [payment](booking_field) should be different
-    - [email](booking_field) should be different
+    - the [payment](booking_field) should be different
+    - the [email](booking_field) should be different
 
-lookup: booking_field
+- lookup: booking_field
 examples: | 
     - name 
     - checkin
@@ -205,6 +245,7 @@ examples: |
     - breakfast 
     - payment 
     - refund
+    - email
 
 entity_synonyms: 
   - synonym: name

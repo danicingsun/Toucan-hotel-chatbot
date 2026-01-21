@@ -9,6 +9,8 @@ from email.mime.text import MIMEText
 import re
 from typing import Any, Dict, Text
 from rasa_sdk.types import DomainDict
+import logging
+
 
 # ============================================================
 # Constants
@@ -18,6 +20,8 @@ MAX_GUESTS = 4
 ROOM_CAPACITY = {"single": 1, "double": 2, "triple": 3, "suite": 4}
 YES_VALUES = {"yes", "y", "true"}
 NO_VALUES = {"no", "n", "false"}
+
+logger = logging.getLogger(__name__)
 
 # ============================================================
 # Utility functions
