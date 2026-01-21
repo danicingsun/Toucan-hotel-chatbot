@@ -337,7 +337,7 @@ class ActionSendConfirmationEmail(Action):
             dispatcher.utter_message( 
                 "I couldn't send the confirmation email, but your booking is saved." 
             ) 
-            print(f"Email error: {e}") 
+            logger.exception("Email send failed")
 
         return [
             SlotSet("name", None),

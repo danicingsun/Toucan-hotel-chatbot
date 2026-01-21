@@ -62,3 +62,11 @@ rules:
     - intent: stop
     - action: action_cancel_booking
     - active_loop: null
+
+# --------------------------------------------------
+# Listen for more input
+# --------------------------------------------------
+- rule: After sending confirmation email, listen
+  steps:
+    - action: action_send_confirmation_email
+    - action: action_listen
