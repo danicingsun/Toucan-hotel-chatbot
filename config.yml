@@ -8,6 +8,9 @@ language: en
 pipeline:
 - name: WhitespaceTokenizer
 - name: RegexFeaturizer
+- name: RegexEntityExtractor
+  use_lookup_tables: true
+  use_regexes: true
 - name: CountVectorsFeaturizer
 - name: LexicalSyntacticFeaturizer
 - name: DIETClassifier
@@ -16,15 +19,13 @@ pipeline:
 - name: ResponseSelector
   epochs: 100
 - name: FallbackClassifier
-  threshold: 0.4
+  threshold: 0.3
 
 policies:
 - name: RulePolicy
   core_fallback_action_name: "action_default_fallback"
   core_fallback_threshold: 0.3
-
 - name: MemoizationPolicy
-
 - name: TEDPolicy
   max_history: 5
   epochs: 200

@@ -119,6 +119,9 @@ slots:
 
 forms:
   booking_form:
+    ignored_intents:
+      - stop
+      - change_booking
     required_slots:
       - name
       - checkin
