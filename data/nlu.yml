@@ -46,6 +46,13 @@ nlu:
     - I want to book, not change anything 
     - I want to make a new booking
 
+- intent: inform
+  examples: |
+    - [credit card](payment)
+    - [cash](payment)
+    - [refundable](refund)
+    - [non-refundable](refund)
+
 - intent: stop
   examples: |
     - cancel

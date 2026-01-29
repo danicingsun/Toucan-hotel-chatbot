@@ -7,9 +7,13 @@ intents:
   - deny
   - greet
   - stop
+  - inform
 
 entities:
   - booking_field
+  - payment
+  - breakfast
+  - refund
 
 slots:
   name:
@@ -61,6 +65,11 @@ slots:
     type: text
     influence_conversation: false
     mappings:
+      - type: from_entity
+        entity: breakfast
+        conditions:
+          - active_loop: booking_form
+            requested_slot: breakfast
       - type: from_text
         conditions:
           - active_loop: booking_form
@@ -70,6 +79,11 @@ slots:
     type: text
     influence_conversation: false
     mappings:
+      - type: from_entity
+        entity: payment
+        conditions:
+          - active_loop: booking_form
+            requested_slot: payment
       - type: from_text
         conditions:
           - active_loop: booking_form
@@ -79,6 +93,11 @@ slots:
     type: text
     influence_conversation: false
     mappings:
+      - type: from_entity
+        entity: refund
+        conditions:
+          - active_loop: booking_form
+            requested_slot: refund
       - type: from_text
         conditions:
           - active_loop: booking_form
@@ -157,25 +176,25 @@ responses:
     - text: "Would you like breakfast included {name}? (yes/no)"
       buttons:
         - title: "✅ YES"
-          payload: "yes"
+          payload: '/inform{"breakfast":"yes"}'
         - title: "❌ NO"
-          payload: "no"
-
+          payload: '/inform{"breakfast":"no"}'
+  
   utter_ask_booking_form_payment:
     - text: "What payment method do you prefer {name}? (credit card / cash)"
       buttons:
         - title: "Credit card"
-          payload: "credit card"
+          payload: '/inform{"payment":"credit card"}'
         - title: "Cash"
-          payload: "cash"
+          payload: '/inform{"payment":"cash"}'
 
   utter_ask_booking_form_refund:
     - text: "Do you prefer a refundable or non-refundable rate?"
       buttons:
         - title: "Refundable"
-          payload: "refundable"
+          payload: '/inform{"refund":"refundable"}'
         - title: "Non-refundable"
-          payload: "non-refundable"
+          payload: '/inform{"refund":"non-refundable"}'
 
   utter_ask_booking_form_email: 
     - text: "{name}, could you please provide email address?"
