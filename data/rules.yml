@@ -70,3 +70,15 @@ rules:
   steps:
     - action: action_send_confirmation_email
     - action: action_listen
+
+# --------------------------------------------------
+# React on garbage input
+# --------------------------------------------------
+- rule: Fallback during booking form
+  condition:
+    - active_loop: booking_form
+  steps:
+    - intent: nlu_fallback
+    - action: utter_please_rephrase
+    - action: booking_form
+    - active_loop: booking_form

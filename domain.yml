@@ -8,6 +8,7 @@ intents:
   - greet
   - stop
   - inform
+  - nlu_fallback
 
 entities:
   - booking_field
@@ -224,6 +225,9 @@ responses:
 
   utter_cancel_booking:
     - text: "Your booking has been cancelled. All details were cleared."
+
+  utter_please_rephrase: 
+    - text: "Sorry, I didn’t catch that. Could you please rephrase?"
 
 
 actions:

@@ -20,6 +20,7 @@ nlu:
     - good afternoon
     - what's up
     - hey friend
+    - hey assistant
     - hiya
     - hallo
 
@@ -48,75 +49,67 @@ nlu:
 
 - intent: inform
   examples: |
+    - Chris
+    - Chris Pratt
+    - Elena Stoyanova
+    - John van Dijk
+    - My name is Chris
+    - The guest name is Chris Pratt
+    - It should be under Chris Pratt
+    - Book it for John van Dijk
+    - 2026-04-12
+    - 2026-12-01
+    - 2027-01-05
+    - check-in is 2026-04-12
+    - my check-in date is 2026-04-12
+    - arrival is 2026-04-12
+    - check-out is 2026-04-15
+    - departure is 2026-04-15
+    - I will arrive on 2026-04-12
+    - I will leave on 2026-04-15
+    - 1
+    - 2
+    - 3
+    - 4
+    - two
+    - three
+    - we are 2 people
+    - there will be 3 guests
+    - for 4 persons
+
+    - single
+    - double
+    - triple
+    - suite
+    - a double room
+    - I want a suite
+    - please make it a triple
+    - room type is double
+
+    - breakfast yes
+    - no breakfast
+    - include breakfast
+    - without breakfast
+
     - [credit card](payment)
     - [cash](payment)
+    - card
+    - pay by card
+    - I will pay cash
+    - payment method is [credit card](payment)
+
     - [refundable](refund)
     - [non-refundable](refund)
+    - nonrefundable
+    - I want [refundable](refund)
+    - [non-refundable](refund) please
+    - refund
 
-- intent: stop
-  examples: |
-    - cancel
-    - stop
-    - never mind
-    - forget it
-    - I don’t want to continue
-    - quit
-    - end booking
-    - abort
-    - drop it
-    - cancel the reservation
-    - stop the process
-    - forget this booking
-    - I changed my mind
-    - no need to continue
-    - terminate
-    - halt
-    - discontinue
-
-- intent: affirm
-  examples: |
-    - aye
-    - yes
-    - yeah
-    - correct
-    - that’s right
-    - please confirm
-    - sounds good
-    - okay
-    - confirm
-    - I confirm
-    - absolutely
-    - sure
-    - indeed
-    - of course
-    - definitely
-    - that works
-    - alright
-    - perfect
-    - agreed
-    - I agree
-    - yup
-
-- intent: deny
-  examples: |
-    - no
-    - nope
-    - not really
-    - don’t confirm
-    - wrong
-    - I don’t want that
-    - I don't confirm
-    - absolutely not
-    - no way
-    - negative
-    - not at all
-    - I disagree
-    - that’s incorrect
-    - I don’t approve
-    - I refuse
-    - nah
-    - not okay
-    - I don’t agree
+    - chris@example.com
+    - chris.pratt@gmail.com
+    - tsveta.stoyanova@company.nl
+    - my email is chris@example.com
+    - send it to chris.pratt@gmail.com
 
 - intent: change_booking
   examples: |
@@ -241,6 +234,77 @@ nlu:
     - no, change the [checkout](booking_field)
     - the [payment](booking_field) should be different
     - the [email](booking_field) should be different
+
+
+- intent: stop
+  examples: |
+    - cancel
+    - cancel the booking
+    - cancel this booking
+    - stop
+    - stop booking
+    - stop the booking process
+    - please cancel everything
+    - abort the reservation
+    - never mind, cancel it
+    - I don’t want to continue
+    - quit the booking
+    - end the booking
+    - forget this booking
+
+- intent: affirm
+  examples: |
+    - yes
+    - yeah
+    - yup
+    - correct
+    - that’s right
+    - confirm
+    - I confirm
+    - please confirm
+    - confirm the booking
+    - confirm this booking
+    - sounds good, confirm it
+    - go ahead and confirm
+
+- intent: deny
+  examples: |
+    - no
+    - nope
+    - nah
+    - don’t confirm
+    - dont confirm
+    - I dont confirm
+    - do not confirm
+    - I don't confirm
+    - cancel it
+    - absolutely not
+    - no way
+    - I disagree
+    - that’s incorrect
+
+- intent: nlu_fallback
+  examples: |
+    - haha
+    - lol
+    - lmao
+    - ?????
+    - ???
+    - ?
+    - ...
+    - skjdhfsksj
+    - siduhfh9w
+    - asdasdasd
+    - qwertyuiop
+    - 123asdf
+    - random text
+    - what
+    - huh
+    - idk
+    - whatever
+    - I don’t know
+    - can you repeat
+    - what do you mean
 
 - lookup: booking_field
 examples: | 
